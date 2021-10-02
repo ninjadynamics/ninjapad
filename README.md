@@ -21,4 +21,4 @@ TL;DR:
 - You can do whatever you want with this project, fork it, modify it, expand it, just give me credit for it.  
 - Be nice, don't do anything nasty like selling NinjaPad as if you created it. :p  
 
-# Enjoy! :D
+## Enjoy!
