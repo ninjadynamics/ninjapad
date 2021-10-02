@@ -3,7 +3,7 @@ NinjaPad is a retro emulation interface for both desktop and mobile.
 Originally designed for the JSNES emulator, NinjaPad is designed in a developer friendly way, allowing for anyone to expand its capabilities.  
 
 ## Try it
-
+https://ninjadynamics.github.io/ninjapad/
 
 ## Quickstart
 Add the folder **ninjapad/** to your project root  
