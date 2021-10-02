@@ -1,0 +1,64 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+        <title>My Cool NES Game</title>
+
+        <!-- jQuery is requirement for NinjaPad to work -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <!-- Path or URL of the emulator you're going to use -->
+        <script src="ninjapad/emu/jsnes/jsnes.min.js"></script>
+        <!-- NinjaPad Interface -->
+        <script src="ninjapad/ninjapad.js"></script>
+
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+            }
+
+            #myCoolDiv {
+                width: 100%;
+                height: 100%;
+                background-color: #222;
+                justify-content: center;
+                align-items: center;
+                display: flex;
+            }
+
+            /* REQUIRED BY NINJAPAD */
+            #emu-screen {
+                width: 256px;
+                max-width: 768px;
+                height: 240px;
+                max-height: 720px;
+                position: relative;
+                margin: auto;
+            }
+
+            #emu-canvas {
+                image-rendering: optimizeSpeed;
+                image-rendering: -moz-crisp-edges;
+                image-rendering: -webkit-optimize-contrast;
+                image-rendering: -o-crisp-edges;
+                image-rendering: crisp-edges;
+                -ms-interpolation-mode: nearest-neighbor;
+                image-rendering: pixelated;
+                width: 100%;
+                height: 100%;
+            }
+            /* End of REQUIRED BY NINJAPAD */
+        </style>
+    </head>
+    <body>
+        <div id="myCoolDiv">
+            <!-- REQUIRED BY NINJAPAD -->
+                <!-- This is the emulator screen (as in the piece of glass that covers the display) -->
+                <div id="emu-screen">
+                    <!-- This is the emulator display (where the pixels are drawn) -->
+                    <canvas id="emu-canvas" width="256" height="240"/>
+                </div>
+            <!-- End of REQUIRED BY NINJAPAD -->
+        </div>
+    </body>
+</html>

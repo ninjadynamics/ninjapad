@@ -1,0 +1,237 @@
+#ninjaPad {
+    background-color: #222;
+    height: 0%;
+}
+
+#GAMEPAD {
+    position: absolute;
+    width: 100%;
+    display: none;
+}
+
+#OSD {
+    position: absolute;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+    font-family: KarmaticArcade;
+    font-size: 5vmin;
+    box-sizing: border-box;
+    padding: 2em;
+    word-spacing: 0.5em;
+    color: red;
+    visibility: hidden;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* unvisited link */
+#OSD a:link {
+  color: red;
+  text-decoration: none;
+}
+
+/* visited link */
+#OSD a:visited {
+  color: red;
+  text-decoration: none;
+}
+
+/* mouse over link */
+#OSD a:hover {
+   color: red;
+   text-decoration: none;
+}
+
+/* selected link */
+#OSD a:active {
+   color: yellow;
+   text-decoration: none;
+}
+
+#DEADZONE {
+    background: #444;
+}
+
+.dirButtons {
+    position: absolute;
+    left: 4%;
+    top: 10vw;
+    width: 35vw;
+    height: 35vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.actionButtons {
+    position: absolute;
+    right: 4%;
+    top: 10vw;
+    width: 35vw;
+    height: 35vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.middleButtons {
+    position: absolute;
+    left: 45%;
+    top: 10vw;
+    width: 10vw;
+    height: 35vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dpad {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+}
+
+.analogRing {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background-color: transparent;
+    border: 2.5vw;
+    border-style: inset;
+}
+
+.analogStick {
+    position: absolute;
+    width: 62%;
+    height: 62%;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background-color: #666;
+    border: 2.5vw;
+    border-style: outset;
+}
+
+.button_B {
+    position: absolute;
+    left: 0%;
+    top: 25%;
+    width: 50%;
+    height: 50%;
+    box-sizing: border-box;
+    border-radius: 50%;
+
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+    font-family: monospace;
+}
+
+.button_A {
+    position: absolute;
+    right: 0%;
+    top: -2.5%;
+    width: 50%;
+    height: 50%;
+    box-sizing: border-box;
+    border-radius: 50%;
+
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+    font-family: monospace;
+}
+
+.button_AB {
+    position: absolute;
+    right: 0%;
+    bottom: -2.5%;
+    width: 50%;
+    height: 50%;
+    box-sizing: border-box;
+    border-radius: 50%;
+
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+    font-family: monospace;
+}
+
+.button_SELECT {
+    position: absolute;
+    left: 0%;
+    top: 30%;
+    width: 100%;
+    height: 16%;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+}
+
+.button_START {
+    position: absolute;
+    left: 0%;
+    top: 55%;
+    width: 100%;
+    height: 16%;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+}
+
+.analogSwitchButton {
+    position: absolute;
+    left: 0%;
+    top: 0%;
+    width: 100%;
+    height: 16%;
+    box-sizing: border-box;
+    background-color: #666;
+    border: 1vw;
+    border-style: outset;
+    border-radius: 20%;
+}
+
+.menuButton {
+    position: absolute;
+    left: 0%;
+    bottom: 0%;
+    width: 100%;
+    height: 16%;
+    box-sizing: border-box;
+    background-color: #666;
+    border: 1vw;
+    border-style: outset;
+    border-radius: 20%;
+}
+
+.box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+[id^="BUTTON"] {
+    background-color: #BBB;
+    border: 1vw;
+    border-style: outset;
+}
+
+@font-face {
+    font-family: 'KarmaticArcade';
+    src: url('res/ka1.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
