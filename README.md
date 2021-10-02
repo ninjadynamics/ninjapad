@@ -11,7 +11,7 @@ Don't forget to try it on your phone as well! ;)
 Add the folder '**ninjapad**' to your project root  
 Configure NinjaPad by editing the file '**ninjapad/config/settings.js**'  
 Use the '**index.html**' example file for reference on how to integrate NinjaPad with your existing project  
-If you're using NinjaPad to showcase your indie game, I'd recommend you setting the '**SINGLE_ROM = true**' in the config file.  
+If you're using NinjaPad to showcase your indie game, I'd recommend you setting '**SINGLE_ROM = true**' in the config file.  
 
 ## Dependencies
 - jQuery  
