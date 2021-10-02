@@ -8,7 +8,7 @@ On desktop, use the ESC key to bring up the menu.
 Don't forget to try it on your phone as well! ;)  
 
 ## Quickstart
-Add the folder '**ninjapad/**' to your project root  
+Add the folder '**ninjapad**' to your project root  
 Configure NinjaPad by editing the file '**ninjapad/config/settings.js**'  
 Use the '**index.html**' example file for reference on how to integrate NinjaPad with your existing project  
 
