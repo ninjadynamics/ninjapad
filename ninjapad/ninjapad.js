@@ -55,7 +55,7 @@ const ninjapad = {
         ninjapad.utils.assign(ninjapad.gamepad.buttonPress, "GAMEPAD-BUTTONS", "start", "move", "end");
         ninjapad.utils.assign(ninjapad.gamepad.analogTouch, "ANALOG_STICK", "start", "move", "end");
         ninjapad.utils.assign(ninjapad.gamepad.toggleFullScreen, SCREEN, "end");
-        ninjapad.utils.assign(null, "GAMEPAD");
+        ninjapad.utils.assign(null, "GAMEPAD"); // Do not remove this line !!!
 
         DEBUG && console.log("NinjaPad: Ready");
     }
