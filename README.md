@@ -8,22 +8,22 @@ On desktop, use the ESC key to bring up the menu.
 Don't forget to try it on your phone as well! ;)  
 
 ## Quickstart
-Add the folder **ninjapad/** to your project root  
-Configure NinjaPad by editing the file **ninjapad/config/settings.js**  
-Use the file **index.html** example file for reference on how to integrate NinjaPad with your existing project  
+Add the folder '**ninjapad/**' to your project root  
+Configure NinjaPad by editing the file '**ninjapad/config/settings.js**'  
+Use the '**index.html**' example file for reference on how to integrate NinjaPad with your existing project  
 
 ## Dependencies
 - jQuery  
 - Emulator  
 
 ## Interfaces
-The file **ninjapad/interface.js** allows you to create new interfaces for different emulators.  
+The file '**ninjapad/interface.js**' allows you to create new interfaces for different emulators.  
 Use the existing **jsnes** interface as a template to create your own.  
 
 ## License
 **Creative Commons Attribution 4.0 International Public License**  
 
-### TL;DR
+## TL;DR
 - You can do whatever you want with this project, fork it, modify it, expand it, just give me credit for it.  
 - Be nice, don't do anything nasty like selling NinjaPad as if you created it. :p  
 
