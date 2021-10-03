@@ -424,7 +424,7 @@ ninjapad.interface = {
             },
 
             isROMLoaded: function() {
-                return !!nes.rom.header
+                return !!nes.rom.header;
             },
 
             initialize: function() {
