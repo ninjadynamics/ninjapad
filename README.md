@@ -24,7 +24,7 @@ Use the existing **jsnes** interface as a template to create your own.
 ## License
 **Creative Commons Attribution 4.0 International Public License**  
 
-## TL;DR
+TL;DR:  
 - You can do whatever you want with this project, fork it, modify it, expand it, just give me credit for it.  
 - Be nice, don't do anything nasty like selling NinjaPad as if you created it. :p  
 
