@@ -24,6 +24,7 @@ const ninjapad = {
         await loadScript("ninjapad/menu.js");
         await loadScript("ninjapad/pause.js");
         await loadScript("ninjapad/gamepad.js");
+        await loadScript("ninjapad/recorder.js");
         await loadScript("ninjapad/interface.js");
 
         // Load HTML files

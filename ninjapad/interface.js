@@ -52,6 +52,7 @@ ninjapad.interface = {
             window.setTimeout(onAnimationFrame, 1000/60);
             image.data.set(framebuffer_u8);
             canvas_ctx.putImageData(image, 0, 0);
+            ninjapad.recorder.read();
             nes.frame();
         }
 
@@ -66,7 +67,10 @@ ninjapad.interface = {
             var len = dst.length;
 
             // Attempt to avoid buffer underruns.
-            if(audio_remain() < AUDIO_BUFFERING) nes.frame();
+            if(audio_remain() < AUDIO_BUFFERING) {
+                ninjapad.recorder.read();
+                nes.frame();
+            }
 
             var dst_l = dst.getChannelData(0);
             var dst_r = dst.getChannelData(1);
@@ -360,10 +364,12 @@ ninjapad.interface = {
 
             buttonDown: function(b) {
                 nes.buttonDown(1, eval("jsnes.Controller." + b));
+                ninjapad.recorder.write(b, true);
             },
 
             buttonUp: function(b) {
                 nes.buttonUp(1, eval("jsnes.Controller." + b));
+                ninjapad.recorder.write(b, false);
             },
 
             pause: function() {
@@ -427,11 +433,13 @@ ninjapad.interface = {
                 return !!nes.rom.header;
             },
 
+            frameCount: function() {
+                return nes.fpsFrameCount;
+            },
+
             initialize: function() {
                 nes_load_url(DISPLAY, DEFAULT_ROM);
             }
-
-            // ...
         };
     }()
 };
