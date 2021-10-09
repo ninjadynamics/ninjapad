@@ -5,21 +5,26 @@ ninjapad.recorder = function() {
     var status = "STOP";
     var userInput;
     var inputIndex;
-    var firstFrame;
     var lastFrame;
     var saveData;
+    var endFrame;
 
     return {
         start: function() {
             status = "REC";
             userInput = [];
+            lastFrame = 0;
+            endFrame = lastFrame;
             saveData = ninjapad.emulator.saveState();
-            firstFrame = ninjapad.emulator.frameCount();
-            lastFrame = firstFrame;
+            // ninjapad.emulator.reloadROM();
+            // ninjapad.emulator.loadState(saveData);
+            ninjapad.emulator.resetFrameCount();
         },
 
         stop: function() {
             status = "STOP";
+            endFrame = ninjapad.emulator.frameCount();
+            console.log(endFrame, sha256(ninjapad.emulator.core.cpu.mem));
         },
 
         play: function() {
@@ -27,8 +32,9 @@ ninjapad.recorder = function() {
             // - - - - - - - - - - - - - - - - - - - - - - - -
             status = "PLAY";
             inputIndex = 0;
-            lastFrame = firstFrame;
+            lastFrame = 0;
             ninjapad.emulator.loadState(saveData);
+            ninjapad.emulator.resetFrameCount();
             ninjapad.pause.resumeEmulation();
         },
 
@@ -47,7 +53,16 @@ ninjapad.recorder = function() {
                     console.log(fn, button.id);
                 }
                 lastFrame = frame;
-                if (++inputIndex == userInput.length) status = "STOP";
+                inputIndex = Math.min(inputIndex + 1, userInput.length - 1);
+                // if (++inputIndex == userInput.length) {
+                //     status = "STOP";
+                //     console.log(ninjapad.emulator.frameCount(), sha256(ninjapad.emulator.core.cpu.mem));
+                // }
+            }
+            if (ninjapad.emulator.frameCount() == endFrame) {
+                status = "STOP";
+                console.log(endFrame, sha256(ninjapad.emulator.core.cpu.mem));
+                ninjapad.pause.pauseEmulation();
             }
         },
 

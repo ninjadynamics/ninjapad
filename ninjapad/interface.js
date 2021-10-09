@@ -25,9 +25,13 @@ ninjapad.interface = {
         var audio_samples_R = new Float32Array(SAMPLE_COUNT);
         var audio_write_cursor = 0, audio_read_cursor = 0;
 
+        var frameCounter = 0;
+
         const nes = new jsnes.NES({
             onFrame: function(framebuffer_24){
                 for(var i = 0; i < FRAMEBUFFER_SIZE; i++) framebuffer_u32[i] = 0xFF000000 | framebuffer_24[i];
+                ninjapad.recorder.read();
+                frameCounter += 1;
             },
             onAudioSample: function(l, r){
                 audio_samples_L[audio_write_cursor] = l;
@@ -52,7 +56,6 @@ ninjapad.interface = {
             window.setTimeout(onAnimationFrame, 1000/60);
             image.data.set(framebuffer_u8);
             canvas_ctx.putImageData(image, 0, 0);
-            ninjapad.recorder.read();
             nes.frame();
         }
 
@@ -66,11 +69,8 @@ ninjapad.interface = {
             var dst = event.outputBuffer;
             var len = dst.length;
 
-            // Attempt to avoid buffer underruns.
-            if(audio_remain() < AUDIO_BUFFERING) {
-                ninjapad.recorder.read();
-                nes.frame();
-            }
+            // Attempt to avoid buffer underruns
+            if(audio_remain() < AUDIO_BUFFERING) nes.frame();
 
             var dst_l = dst.getChannelData(0);
             var dst_r = dst.getChannelData(1);
@@ -434,7 +434,11 @@ ninjapad.interface = {
             },
 
             frameCount: function() {
-                return nes.fpsFrameCount;
+                return frameCounter;
+            },
+
+            resetFrameCount: function() {
+                frameCounter = 0;
             },
 
             initialize: function() {
