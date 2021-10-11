@@ -30,8 +30,14 @@ ninjapad.interface = {
         const nes = new jsnes.NES({
             onFrame: function(framebuffer_24){
                 for(var i = 0; i < FRAMEBUFFER_SIZE; i++) framebuffer_u32[i] = 0xFF000000 | framebuffer_24[i];
-                ninjapad.recorder.read();
-                frameCounter += 1;
+                if (action.length) {
+                    for (const a of action) eval(a);
+                    action = [];
+                }
+                ninjapad.recorder.write(frameCounter);
+                ninjapad.recorder.read(frameCounter);
+                console.log(frameCounter, sha256(nes.cpu.mem));
+                ++frameCounter;
             },
             onAudioSample: function(l, r){
                 audio_samples_L[audio_write_cursor] = l;
@@ -56,7 +62,7 @@ ninjapad.interface = {
             window.setTimeout(onAnimationFrame, 1000/60);
             image.data.set(framebuffer_u8);
             canvas_ctx.putImageData(image, 0, 0);
-            nes.frame();
+            if (!ninjapad.pause.state.isEmulationPaused) for (var iii = 0; iii < SPEED; ++iii) nes.frame();
         }
 
         function audio_remain(){
@@ -70,7 +76,7 @@ ninjapad.interface = {
             var len = dst.length;
 
             // Attempt to avoid buffer underruns
-            if(audio_remain() < AUDIO_BUFFERING) nes.frame();
+            if(audio_remain() < AUDIO_BUFFERING && !ninjapad.pause.state.isEmulationPaused) for (var iii = 0; iii < SPEED; ++iii) nes.frame();
 
             var dst_l = dst.getChannelData(0);
             var dst_r = dst.getChannelData(1);
@@ -350,6 +356,8 @@ ninjapad.interface = {
          setInterval(scangamepads, 500);
         }
 
+        var action = [];
+
         // If you wish to create your own interface,
         // you need to provide the exact same keys
         return {
@@ -363,19 +371,44 @@ ninjapad.interface = {
             }(),
 
             buttonDown: function(b) {
-                nes.buttonDown(1, eval("jsnes.Controller." + b));
-                ninjapad.recorder.write(b, true);
+                if (ninjapad.recorder.status() == "REC") {
+                    action.push('nes.buttonDown(1, jsnes.Controller.' + b + ');');
+                }
+                else {
+                    nes.buttonDown(1, eval("jsnes.Controller." + b));
+                }
+                ninjapad.recorder.buffer(b, true);
             },
 
             buttonUp: function(b) {
-                nes.buttonUp(1, eval("jsnes.Controller." + b));
-                ninjapad.recorder.write(b, false);
+                if (ninjapad.recorder.status() == "REC") {
+                    action.push('nes.buttonUp(1, jsnes.Controller.' + b + ');');
+                }
+                else {
+                    nes.buttonUp(1, eval("jsnes.Controller." + b));
+                }
+                ninjapad.recorder.buffer(b, false);
             },
+
+            // buttonDown: function(b) {
+            //     fn = nes.buttonDown;
+            //     ninjapad.recorder.status() == "REC" ?
+            //         ninjapad.recorder.buffer(b, true, fn) :
+            //         fn(1, eval("jsnes.Controller." + b));
+            // },
+            //
+            // buttonUp: function(b) {
+            //     fn = nes.buttonUp;
+            //     ninjapad.recorder.status() == "REC" ?
+            //         ninjapad.recorder.buffer(b, false, fn) :
+            //         fn(1, eval("jsnes.Controller." + b));
+            // },
 
             pause: function() {
                 function _pause() {
                     if (nes.break) return;
                     // - - - - - - - - - - - - - - - - - - - - - - -
+                    nes.break = true;
                     if (audio_ctx && audio_ctx.suspend) {
                         audio_ctx.suspend();
                     }
@@ -383,7 +416,6 @@ ninjapad.interface = {
                         resume: function(){},
                         isNull: true
                     };
-                    nes.break = true;
                     if (typeof enforcePause === 'undefined') {
                         enforcePause = setInterval(_pause, 16);
                     }
@@ -435,10 +467,12 @@ ninjapad.interface = {
 
             frameCount: function() {
                 return frameCounter;
+                //return nes.fpsFrameCount;
             },
 
             resetFrameCount: function() {
                 frameCounter = 0;
+                //nes.fpsFrameCount = 0;
             },
 
             initialize: function() {

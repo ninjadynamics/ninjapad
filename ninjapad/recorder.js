@@ -8,79 +8,101 @@ ninjapad.recorder = function() {
     var lastFrame;
     var saveData;
     var endFrame;
+    var writeBuffer;
+    var hash, ok, f;
 
     return {
-        start: function() {
-            status = "REC";
-            userInput = [];
-            lastFrame = 0;
-            endFrame = lastFrame;
-            saveData = ninjapad.emulator.saveState();
-            // ninjapad.emulator.reloadROM();
-            // ninjapad.emulator.loadState(saveData);
+        status: function() {
+            return status;
+        },
+
+        start: function() { ok = false; f = -1;
+            ninjapad.pause.pauseEmulation();
             ninjapad.emulator.resetFrameCount();
+            saveData = ninjapad.emulator.saveState();
+            lastFrame = 0; endFrame = lastFrame;
+            userInput = []; writeBuffer = [];
+            console.log(sha256(ninjapad.emulator.core.cpu.mem));
+            status = "REC";
         },
 
         stop: function() {
+            //endFrame = ninjapad.emulator.frameCount();
+            ninjapad.pause.pauseEmulation();
+            hash = sha256(ninjapad.emulator.core.cpu.mem);
+            console.log(endFrame, hash);
             status = "STOP";
-            endFrame = ninjapad.emulator.frameCount();
-            console.log(endFrame, sha256(ninjapad.emulator.core.cpu.mem));
         },
 
         play: function() {
-            if (userInput.length == 0) return;
+            if (!endFrame) return;
             // - - - - - - - - - - - - - - - - - - - - - - - -
-            status = "PLAY";
-            inputIndex = 0;
-            lastFrame = 0;
-            ninjapad.emulator.loadState(saveData);
+            ninjapad.pause.pauseEmulation();
             ninjapad.emulator.resetFrameCount();
+            ninjapad.emulator.loadState(saveData);
             ninjapad.pause.resumeEmulation();
+            inputIndex = 0; lastFrame = 0;
+            status = "PLAY";
         },
 
-        read: function() {
+        read: function(frameIndex) {
             if (status != "PLAY") return;
             // - - - - - - - - - - - - - - - - - - - - - - - -
-            const input = userInput[inputIndex];
-            const frame = lastFrame + input.offset;
-            const currentFrame = ninjapad.emulator.frameCount();
-            if (currentFrame == frame) {
-                for (const button of input.buttons) {
-                    const fn = button.pressed ?
-                        ninjapad.emulator.buttonDown :
-                        ninjapad.emulator.buttonUp;
-                    fn(button.id);
-                    console.log(fn, button.id);
+            if (inputIndex < userInput.length) {
+                const input = userInput[inputIndex];
+                const frame = lastFrame + input.offset;
+                if (frameIndex == frame) {
+                    for (const button of input.buttons) {
+                        const fn = button.pressed ?
+                            ninjapad.emulator.buttonDown :
+                            ninjapad.emulator.buttonUp;
+                        fn(button.id);
+                        console.log(button.pressed, button.id);
+                    }
+                    lastFrame = frame;
+                    ++inputIndex;
                 }
-                lastFrame = frame;
-                inputIndex = Math.min(inputIndex + 1, userInput.length - 1);
-                // if (++inputIndex == userInput.length) {
-                //     status = "STOP";
-                //     console.log(ninjapad.emulator.frameCount(), sha256(ninjapad.emulator.core.cpu.mem));
-                // }
             }
-            if (ninjapad.emulator.frameCount() == endFrame) {
+
+            var h = sha256(ninjapad.emulator.core.cpu.mem);
+            if (h == hash) { ok = true; f = frameIndex; }
+
+            if (frameIndex == endFrame) {
                 status = "STOP";
-                console.log(endFrame, sha256(ninjapad.emulator.core.cpu.mem));
                 ninjapad.pause.pauseEmulation();
+                console.log(f, ok);
             }
         },
 
-        write: function(button, pressed) {
+        buffer: function(button, pressed) {
             if (status != "REC") return;
             // - - - - - - - - - - - - - - - - - - - - - - - -
-            const currentFrame = ninjapad.emulator.frameCount();
-            if (currentFrame > lastFrame) {
-                userInput.push({
-                    offset: ninjapad.emulator.frameCount() - lastFrame,
-                    buttons: []
-                });
-                lastFrame = currentFrame;
-            }
-            const i = userInput.length - 1;
-            userInput[i].buttons.push({
+            writeBuffer.push({
                 id: button, pressed: pressed
             });
+        },
+
+        // buffer: function(button, pressed, fn) {
+        //     if (status != "REC") return;
+        //     // - - - - - - - - - - - - - - - - - - - - - - - -
+        //     fn(1, eval("jsnes.Controller." + button));
+        //     writeBuffer.push({
+        //         id: button, pressed: pressed
+        //     });
+        // },
+
+        write: function(frameIndex) {
+            if (status != "REC") return;
+            // - - - - - - - - - - - - - - - - - - - - - - - -
+            if (writeBuffer.length > 0 && frameIndex > lastFrame) {
+                userInput.push({
+                    offset: frameIndex - lastFrame,
+                    buttons: writeBuffer
+                });
+                lastFrame = frameIndex;
+                writeBuffer = [];
+            }
+            endFrame = frameIndex;
         },
 
         export: function() {
