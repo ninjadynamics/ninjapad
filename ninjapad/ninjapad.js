@@ -47,6 +47,12 @@ const ninjapad = {
             screen:         $("#" + SCREEN),
         };
 
+        // Input recorder
+        ninjapad.recorder.initialize(
+            ninjapad.emulator.buttonUp,
+            ninjapad.emulator.buttonDown
+        );
+
         // Page setup
         ninjapad.layout.setPageLayout();
 

@@ -370,39 +370,35 @@ ninjapad.interface = {
                 return nes;
             }(),
 
-            buttonDown: function(b) {
-                if (ninjapad.recorder.status() == "REC") {
-                    action.push('nes.buttonDown(1, jsnes.Controller.' + b + ');');
-                }
-                else {
-                    nes.buttonDown(1, eval("jsnes.Controller." + b));
-                }
-                ninjapad.recorder.buffer(b, true);
-            },
-
-            buttonUp: function(b) {
-                if (ninjapad.recorder.status() == "REC") {
-                    action.push('nes.buttonUp(1, jsnes.Controller.' + b + ');');
-                }
-                else {
-                    nes.buttonUp(1, eval("jsnes.Controller." + b));
-                }
-                ninjapad.recorder.buffer(b, false);
-            },
-
             // buttonDown: function(b) {
-            //     fn = nes.buttonDown;
-            //     ninjapad.recorder.status() == "REC" ?
-            //         ninjapad.recorder.buffer(b, true, fn) :
-            //         fn(1, eval("jsnes.Controller." + b));
+            //     if (ninjapad.recorder.status() == "REC") {
+            //         action.push('nes.buttonDown(1, jsnes.Controller.' + b + ');');
+            //     }
+            //     else {
+            //         nes.buttonDown(1, eval("jsnes.Controller." + b));
+            //     }
+            //     ninjapad.recorder.buffer(b, true);
             // },
             //
             // buttonUp: function(b) {
-            //     fn = nes.buttonUp;
-            //     ninjapad.recorder.status() == "REC" ?
-            //         ninjapad.recorder.buffer(b, false, fn) :
-            //         fn(1, eval("jsnes.Controller." + b));
+            //     if (ninjapad.recorder.status() == "REC") {
+            //         action.push('nes.buttonUp(1, jsnes.Controller.' + b + ');');
+            //     }
+            //     else {
+            //         nes.buttonUp(1, eval("jsnes.Controller." + b));
+            //     }
+            //     ninjapad.recorder.buffer(b, false);
             // },
+
+            buttonDown: function(b) {
+                ninjapad.recorder.buffer(b, true) ||
+                nes.buttonDown(1, eval("jsnes.Controller." + b));
+            },
+
+            buttonUp: function(b) {
+                ninjapad.recorder.buffer(b, false) ||
+                nes.buttonUp(1, eval("jsnes.Controller." + b));
+            },
 
             pause: function() {
                 function _pause() {

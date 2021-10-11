@@ -9,11 +9,16 @@ ninjapad.recorder = function() {
     var saveData;
     var endFrame;
     var writeBuffer;
+    var fnButtonPress;
+
     var hash, ok, f;
 
     return {
-        status: function() {
-            return status;
+        initialize: function(fnButtonUp, fnButtonDown) {
+            fnButtonPress = {
+                false: fnButtonUp,
+                true: fnButtonDown
+            }
         },
 
         start: function() { ok = false; f = -1;
@@ -46,17 +51,14 @@ ninjapad.recorder = function() {
         },
 
         read: function(frameIndex) {
-            if (status != "PLAY") return;
+            if (status != "PLAY") return false;
             // - - - - - - - - - - - - - - - - - - - - - - - -
             if (inputIndex < userInput.length) {
                 const input = userInput[inputIndex];
                 const frame = lastFrame + input.offset;
                 if (frameIndex == frame) {
                     for (const button of input.buttons) {
-                        const fn = button.pressed ?
-                            ninjapad.emulator.buttonDown :
-                            ninjapad.emulator.buttonUp;
-                        fn(button.id);
+                        fnButtonPress[button.pressed](button.id);
                         console.log(button.pressed, button.id);
                     }
                     lastFrame = frame;
@@ -72,29 +74,29 @@ ninjapad.recorder = function() {
                 ninjapad.pause.pauseEmulation();
                 console.log(f, ok);
             }
+
+            return true;
         },
 
         buffer: function(button, pressed) {
-            if (status != "REC") return;
+            if (status != "REC") return false;
             // - - - - - - - - - - - - - - - - - - - - - - - -
             writeBuffer.push({
-                id: button, pressed: pressed
+                id: button,
+                pressed: pressed
             });
+            return true;
         },
 
-        // buffer: function(button, pressed, fn) {
-        //     if (status != "REC") return;
-        //     // - - - - - - - - - - - - - - - - - - - - - - - -
-        //     fn(1, eval("jsnes.Controller." + button));
-        //     writeBuffer.push({
-        //         id: button, pressed: pressed
-        //     });
-        // },
-
         write: function(frameIndex) {
-            if (status != "REC") return;
+            if (status != "REC") return false;
             // - - - - - - - - - - - - - - - - - - - - - - - -
             if (writeBuffer.length > 0 && frameIndex > lastFrame) {
+                status = "PAUSE";
+                for (const button of writeBuffer) {
+                    fnButtonPress[button.pressed](button.id);
+                }
+                status = "REC";
                 userInput.push({
                     offset: frameIndex - lastFrame,
                     buttons: writeBuffer
@@ -103,6 +105,7 @@ ninjapad.recorder = function() {
                 writeBuffer = [];
             }
             endFrame = frameIndex;
+            return true;
         },
 
         export: function() {
