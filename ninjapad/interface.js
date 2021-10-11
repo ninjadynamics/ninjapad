@@ -36,7 +36,7 @@ ninjapad.interface = {
                 }
                 ninjapad.recorder.write(frameCounter);
                 ninjapad.recorder.read(frameCounter);
-                console.log(frameCounter, sha256(nes.cpu.mem));
+                //console.log(frameCounter, sha256(nes.cpu.mem));
                 ++frameCounter;
             },
             onAudioSample: function(l, r){
@@ -370,26 +370,6 @@ ninjapad.interface = {
                 return nes;
             }(),
 
-            // buttonDown: function(b) {
-            //     if (ninjapad.recorder.status() == "REC") {
-            //         action.push('nes.buttonDown(1, jsnes.Controller.' + b + ');');
-            //     }
-            //     else {
-            //         nes.buttonDown(1, eval("jsnes.Controller." + b));
-            //     }
-            //     ninjapad.recorder.buffer(b, true);
-            // },
-            //
-            // buttonUp: function(b) {
-            //     if (ninjapad.recorder.status() == "REC") {
-            //         action.push('nes.buttonUp(1, jsnes.Controller.' + b + ');');
-            //     }
-            //     else {
-            //         nes.buttonUp(1, eval("jsnes.Controller." + b));
-            //     }
-            //     ninjapad.recorder.buffer(b, false);
-            // },
-
             buttonDown: function(b) {
                 ninjapad.recorder.buffer(b, true) ||
                 nes.buttonDown(1, eval("jsnes.Controller." + b));
@@ -463,12 +443,10 @@ ninjapad.interface = {
 
             frameCount: function() {
                 return frameCounter;
-                //return nes.fpsFrameCount;
             },
 
             resetFrameCount: function() {
                 frameCounter = 0;
-                //nes.fpsFrameCount = 0;
             },
 
             initialize: function() {
