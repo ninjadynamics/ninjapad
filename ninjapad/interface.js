@@ -56,7 +56,18 @@ ninjapad.interface = {
             13: "BUTTON_START"      // Enter
         }
 
-        var buttonPresses = {
+        var gpButtonPresses = {
+            "BUTTON_UP": false,
+            "BUTTON_DOWN": false,
+            "BUTTON_LEFT": false,
+            "BUTTON_RIGHT": false,
+            "BUTTON_A": false,
+            "BUTTON_B": false,
+            "BUTTON_SELECT": false,
+            "BUTTON_START": false
+        };
+
+        var kbButtonPresses = {
             "BUTTON_UP": false,
             "BUTTON_DOWN": false,
             "BUTTON_LEFT": false,
@@ -125,9 +136,13 @@ ninjapad.interface = {
         }
 
         function keyboard(callback, event) {
+            var id = event.keyCode;
             var button = keyboardMappings[event.keyCode];
+            var isPressed = callback == buttonDown;
+            if (isPressed && kbButtonPresses[id]) return;
             if (typeof(button) === "undefined") return;
             callback(button);
+            kbButtonPresses[id] = isPressed;
             event.preventDefault();
         }
 
@@ -258,17 +273,17 @@ ninjapad.interface = {
                     var button = controller.buttons[i];
                     var id = controllerMappings[i];
                     if (button.pressed) {
-                        if (buttonPresses[id]) continue;
+                        if (gpButtonPresses[id]) continue;
                         // - - - - - - - - - - - - - - - -
                         if (audio_ctx) audio_ctx.resume();
                         buttonDown(id);
-                        buttonPresses[id] = true;
+                        gpButtonPresses[id] = true;
                     }
                     else {
-                        if (!buttonPresses[id]) continue;
+                        if (!gpButtonPresses[id]) continue;
                         // - - - - - - - - - - - - - - - -
                         buttonUp(id);
-                        buttonPresses[id] = false;
+                        gpButtonPresses[id] = false;
                     }
                 }
             }
@@ -396,7 +411,7 @@ ninjapad.interface = {
 
             memory: function() {
                 return nes.cpu.mem;
-            },            
+            },
 
             initialize: function() {
                 nes_load_url(DISPLAY, DEFAULT_ROM);
