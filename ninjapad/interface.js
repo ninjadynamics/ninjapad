@@ -125,39 +125,10 @@ ninjapad.interface = {
         }
 
         function keyboard(callback, event) {
-            var player = 1;
-            var prevent = true;
-            switch(event.keyCode){
-                case 38: // UP
-                case 87: // W
-                    callback(player, jsnes.Controller.BUTTON_UP); break;
-                case 40: // Down
-                case 83: // S
-                    callback(player, jsnes.Controller.BUTTON_DOWN); break;
-                case 37: // Left
-                case 65: // A
-                    callback(player, jsnes.Controller.BUTTON_LEFT); break;
-                case 39: // Right
-                case 68: // D
-                    callback(player, jsnes.Controller.BUTTON_RIGHT); break;
-                case 18: // 'alt'
-                case 88: // 'x'
-                    callback(player, jsnes.Controller.BUTTON_A); break;
-                case 90: // 'z'
-                case 17: // 'ctrl'
-                    callback(player, jsnes.Controller.BUTTON_B); break;
-                case 32: // Space
-                case 16: // Right Shift
-                    callback(player, jsnes.Controller.BUTTON_SELECT); break;
-                case 13: // Return
-                    callback(player, jsnes.Controller.BUTTON_START); break;
-                default:
-                    prevent = false; break;
-            }
-
-            if (prevent){
-                event.preventDefault();
-            }
+            var button = keyboardMappings[event.keyCode];
+            if (typeof(button) === "undefined") return;
+            callback(button);
+            event.preventDefault();
         }
 
         function nes_init(canvas_id){
@@ -213,8 +184,8 @@ ninjapad.interface = {
             req.send();
         }
 
-        document.addEventListener('keydown', (event) => {keyboard(nes.buttonDown, event)});
-        document.addEventListener('keyup', (event) => {keyboard(nes.buttonUp, event)});
+        document.addEventListener('keydown', (event) => {keyboard(buttonDown, event)});
+        document.addEventListener('keyup', (event) => {keyboard(buttonUp, event)});
 
         /////////////////////
         // GAMEPAD SUPPORT
@@ -422,6 +393,10 @@ ninjapad.interface = {
             resetFrameCount: function() {
                 frameCounter = 0;
             },
+
+            memory: function() {
+                return nes.cpu.mem;
+            },            
 
             initialize: function() {
                 nes_load_url(DISPLAY, DEFAULT_ROM);

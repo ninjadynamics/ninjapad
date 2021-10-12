@@ -2,7 +2,12 @@
 // Creative Commons Attribution 4.0 International Public License
 
 ninjapad.recorder = function() {
-    var status = "STOP";
+    const STOP  = 0;
+    const PAUSE = 1;
+    const PLAY  = 2;
+    const REC   = 3;
+
+    var status = STOP;
     var userInput;
     var inputIndex;
     var lastFrame;
@@ -10,8 +15,7 @@ ninjapad.recorder = function() {
     var endFrame;
     var writeBuffer;
     var fnButtonPress;
-
-    var hash, ok, f;
+    var memoryHash;
 
     return {
         initialize: function(fnButtonUp, fnButtonDown) {
@@ -21,22 +25,24 @@ ninjapad.recorder = function() {
             }
         },
 
-        start: function() { ok = false; f = -1;
+        status: function() {
+            return status;
+        },
+
+        start: function() {
             ninjapad.pause.pauseEmulation();
             ninjapad.emulator.resetFrameCount();
             saveData = ninjapad.emulator.saveState();
             lastFrame = 0; endFrame = lastFrame;
             userInput = []; writeBuffer = [];
-            console.log(sha256(ninjapad.emulator.core.cpu.mem));
-            status = "REC";
+            status = REC;
         },
 
         stop: function() {
-            //endFrame = ninjapad.emulator.frameCount();
             ninjapad.pause.pauseEmulation();
-            hash = sha256(ninjapad.emulator.core.cpu.mem);
-            console.log(endFrame, hash);
-            status = "STOP";
+            var memory = ninjapad.emulator.memory();
+            memoryHash = sha256(memory);
+            status = STOP;
         },
 
         play: function() {
@@ -47,11 +53,11 @@ ninjapad.recorder = function() {
             ninjapad.emulator.loadState(saveData);
             ninjapad.pause.resumeEmulation();
             inputIndex = 0; lastFrame = 0;
-            status = "PLAY";
+            status = PLAY;
         },
 
         read: function(frameIndex) {
-            if (status != "PLAY") return false;
+            if (status != PLAY) return false;
             // - - - - - - - - - - - - - - - - - - - - - - - -
             if (inputIndex < userInput.length) {
                 const input = userInput[inputIndex];
@@ -65,21 +71,21 @@ ninjapad.recorder = function() {
                     ++inputIndex;
                 }
             }
-
-            var h = sha256(ninjapad.emulator.core.cpu.mem);
-            if (h == hash) { ok = true; f = frameIndex; }
-
             if (frameIndex == endFrame) {
-                status = "STOP";
+                status = STOP;
                 ninjapad.pause.pauseEmulation();
-                console.log(f, ok);
+                var memory = ninjapad.emulator.memory();
+                var result = (sha256(memory) == memoryHash);
+                DEBUG && console.log(
+                    "NinjaPad: Playback consistency check:",
+                    result ? "PASS" : "FAIL"
+                );
             }
-
             return true;
         },
 
         buffer: function(button, pressed) {
-            if (status != "REC") return false;
+            if (status != REC) return false;
             // - - - - - - - - - - - - - - - - - - - - - - - -
             writeBuffer.push({
                 id: button,
@@ -89,14 +95,14 @@ ninjapad.recorder = function() {
         },
 
         write: function(frameIndex) {
-            if (status != "REC") return false;
+            if (status != REC) return false;
             // - - - - - - - - - - - - - - - - - - - - - - - -
             if (writeBuffer.length > 0 && frameIndex > lastFrame) {
-                status = "PAUSE";
+                status = PAUSE;
                 for (const button of writeBuffer) {
                     fnButtonPress[button.pressed](button.id);
                 }
-                status = "REC";
+                status = REC;
                 userInput.push({
                     offset: frameIndex - lastFrame,
                     buttons: writeBuffer
