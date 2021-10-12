@@ -27,15 +27,50 @@ ninjapad.interface = {
 
         var frameCounter = 0;
 
+        var controllerMappings = {  // DualShock 4
+            12: "BUTTON_UP",        // DPAD Up
+            13: "BUTTON_DOWN",      // DPAD Down
+            14: "BUTTON_LEFT",      // DPAD Left
+            15: "BUTTON_RIGHT",     // DPAD Right
+             0: "BUTTON_A",         // Cross
+             2: "BUTTON_B",         // Square
+             8: "BUTTON_SELECT",    // Share
+             9: "BUTTON_START"      // Options
+        }
+
+        var keyboardMappings = {
+            38: "BUTTON_UP",        // Up
+            87: "BUTTON_UP",        // W
+            40: "BUTTON_DOWN",      // Down
+            83: "BUTTON_DOWN",      // S
+            37: "BUTTON_LEFT",      // Left
+            65: "BUTTON_LEFT",      // A
+            39: "BUTTON_RIGHT",     // Right
+            68: "BUTTON_RIGHT",     // D
+            18: "BUTTON_A",         // Alt
+            88: "BUTTON_A",         // X
+            17: "BUTTON_B",         // Ctrl
+            90: "BUTTON_B",         // Z
+            32: "BUTTON_SELECT",    // Space
+            16: "BUTTON_SELECT",    // Right Shift
+            13: "BUTTON_START"      // Enter
+        }
+
+        var buttonPresses = {
+            "BUTTON_UP": false,
+            "BUTTON_DOWN": false,
+            "BUTTON_LEFT": false,
+            "BUTTON_RIGHT": false,
+            "BUTTON_A": false,
+            "BUTTON_B": false,
+            "BUTTON_SELECT": false,
+            "BUTTON_START": false
+        };
+
         const nes = new jsnes.NES({
             onFrame: function(framebuffer_24){
                 for(var i = 0; i < FRAMEBUFFER_SIZE; i++) framebuffer_u32[i] = 0xFF000000 | framebuffer_24[i];
-                if (action.length) {
-                    for (const a of action) eval(a);
-                    action = [];
-                }
-                ninjapad.recorder.write(frameCounter);
-                ninjapad.recorder.read(frameCounter);
+                ninjapad.recorder.read(frameCounter) || ninjapad.recorder.write(frameCounter);
                 //console.log(frameCounter, sha256(nes.cpu.mem));
                 ++frameCounter;
             },
@@ -215,124 +250,57 @@ ninjapad.interface = {
 
         // Check all controllers to see if player has pressed any buttons.
         // If they have, store that as the current controller.
-        function findController()
-        {
-            var i = 0;
-            var j;
-
-            for (j in controllers)
-            {
+        function findController() {
+            for (var j in controllers) {
                 var controller = controllers[j];
-
-                for (i = 0; i < controller.buttons.length; i++)
-                {
+                for (var i = 0; i < controller.buttons.length; ++i) {
                     var val = controller.buttons[i];
                     var pressed = val == 1.0;
-                    if (typeof(val) == "object")
-                    {
+                    if (typeof(val) == "object") {
                         pressed = val.pressed;
                         val = val.value;
                     }
-
-                    if (pressed)
-                    {
+                    if (pressed) {
                         cur_controller_index = j;
                     }
                 }
             }
         }
 
-        function updateStatus()
-        {
-            if (!haveEvents)
-            {
+        function updateStatus() {
+            if (!haveEvents) {
                 scangamepads();
             }
 
             // If a controller has not yet been chosen, check for one now.
-            if (cur_controller_index == -1)
-            {
-              findController();
+            if (cur_controller_index == -1) {
+                findController();
             }
 
             // Allow for case where controller was chosen this frame
-            if (cur_controller_index != -1)
-            {
-                var i = 0;
-                var j;
-
+            if (cur_controller_index != -1) {
                 var controller = controllers[cur_controller_index];
-
-                for (i = 0; i < controller.buttons.length; i++)
-                {
-                    var val = controller.buttons[i];
-                    var pressed = val == 1.0;
-                    if (typeof(val) == "object")
-                    {
-                        pressed = val.pressed;
-                        val = val.value;
+                for (var i = 0; i < controller.buttons.length; i++) {
+                    if (typeof(controllerMappings[i]) === "undefined") {
+                        continue;
                     }
-
-                    var player = 1 //parseInt(j,10) + 1;
-
-                    if (pressed)
-                    {
+                    var button = controller.buttons[i];
+                    var id = controllerMappings[i];
+                    if (button.pressed) {
+                        if (buttonPresses[id]) continue;
+                        // - - - - - - - - - - - - - - - -
                         if (audio_ctx) audio_ctx.resume();
-                        var callback = nes.buttonDown;
-                        switch(i)
-                        {
-                            case 12: // UP
-                            callback(player, jsnes.Controller.BUTTON_UP); break;
-                            case 13: // Down
-                            callback(player, jsnes.Controller.BUTTON_DOWN); break;
-                            case 14: // Left
-                            callback(player, jsnes.Controller.BUTTON_LEFT); break;
-                            case 15: // Right
-                            callback(player, jsnes.Controller.BUTTON_RIGHT); break;
-                            case BUTTON_A: // 'A'
-                            callback(player, jsnes.Controller.BUTTON_A); break;
-                            case BUTTON_B: // 'B'
-                            callback(player, jsnes.Controller.BUTTON_B); break;
-                            case 8: // Select
-                            callback(player, jsnes.Controller.BUTTON_SELECT); break;
-                            case 9: // Start
-                            callback(player, jsnes.Controller.BUTTON_START); break;
-                        }
+                        buttonDown(id);
+                        buttonPresses[id] = true;
                     }
-                    else
-                    {
-                        var callback = nes.buttonUp;
-                        switch(i)
-                        {
-                            case 12: // UP
-                            callback(player, jsnes.Controller.BUTTON_UP); break;
-                            case 13: // Down
-                            callback(player, jsnes.Controller.BUTTON_DOWN); break;
-                            case 14: // Left
-                            callback(player, jsnes.Controller.BUTTON_LEFT); break;
-                            case 15: // Right
-                            callback(player, jsnes.Controller.BUTTON_RIGHT); break;
-                            case BUTTON_A: // 'A'
-                            callback(player, jsnes.Controller.BUTTON_A); break;
-                            case BUTTON_B: // 'B'
-                            callback(player, jsnes.Controller.BUTTON_B); break;
-                            case 8: // Select
-                            callback(player, jsnes.Controller.BUTTON_SELECT); break;
-                            case 9: // Start
-                            callback(player, jsnes.Controller.BUTTON_START); break;
-                        }
+                    else {
+                        if (!buttonPresses[id]) continue;
+                        // - - - - - - - - - - - - - - - -
+                        buttonUp(id);
+                        buttonPresses[id] = false;
                     }
-
-                    // var axes = d.getElementsByClassName("axis");
-                    // for (i = 0; i < controller.axes.length; i++)
-                    // {
-                        // var a = axes[i];
-                        // a.innerHTML = i + ": " + controller.axes[i].toFixed(4);
-                        // a.setAttribute("value", controller.axes[i] + 1);
-                    // }
                 }
             }
-
             requestAnimationFrame(updateStatus);
         }
 
@@ -356,7 +324,15 @@ ninjapad.interface = {
          setInterval(scangamepads, 500);
         }
 
-        var action = [];
+        function buttonDown(b) {
+            if (ninjapad.recorder.buffer(b, true)) return;
+            nes.buttonDown(1, eval("jsnes.Controller." + b));
+        }
+
+        function buttonUp(b) {
+            if (ninjapad.recorder.buffer(b, false)) return;
+            nes.buttonUp(1, eval("jsnes.Controller." + b));
+        }
 
         // If you wish to create your own interface,
         // you need to provide the exact same keys
@@ -371,13 +347,11 @@ ninjapad.interface = {
             }(),
 
             buttonDown: function(b) {
-                ninjapad.recorder.buffer(b, true) ||
-                nes.buttonDown(1, eval("jsnes.Controller." + b));
+                buttonDown(b);
             },
 
             buttonUp: function(b) {
-                ninjapad.recorder.buffer(b, false) ||
-                nes.buttonUp(1, eval("jsnes.Controller." + b));
+                buttonUp(b);
             },
 
             pause: function() {
