@@ -2,7 +2,19 @@
 // Creative Commons Attribution 4.0 International Public License
 
 ninjapad.menu = function() {
+    const iRStates = [
+        "OFF",
+        "ON-R",
+        "ON-S"
+    ];
+
+    var iRState = 0;
+
     var state = { isOpen: false };
+
+    function inColor(color, text) {
+        return `<font color='${color}'>${text}</font>`;
+    }
 
     function allowUserInteraction(ontap=null) {
         ninjapad.utils.allowInteraction("pauseScreenContent");
@@ -21,24 +33,64 @@ ninjapad.menu = function() {
         preventUserInteraction(returnToMainMenu);
     }
 
-    function mainMenu() {
-        const upload = "ninjapad.menu.uploadROM()";
-        const save = "ninjapad.menu.saveState();";
-        const load = "ninjapad.menu.loadState();";
-        const reset = "ninjapad.menu.reset();"
-        const about = "ninjapad.menu.showCredits()";
+    function optionsMenu() {
         return ninjapad.utils.createMenu(null,
-            ninjapad.utils.link("Load ROM", js=upload, hide=SINGLE_ROM),
-            ninjapad.utils.link("Save State", js=save),
-            ninjapad.utils.link("Load State", js=load),
-            ninjapad.utils.link("Reset", js=reset),
-            ninjapad.utils.link("About", js=about)
+            ninjapad.utils.link("Import save data"),
+            ninjapad.utils.link("Export save data"),
+            ninjapad.utils.link(
+                `Input recorder ${inColor("lime", iRStates[iRState])}`,
+                js=`ninjapad.menu.cycleIRState();
+                    ninjapad.menu.options()`
+            ),
+            ninjapad.utils.link(
+                `${inColor("yellow", "BACK")}`,
+                js="ninjapad.menu.mainMenu()"
+            ),
         );
+    }
+
+    function mainMenu() {
+        return ninjapad.utils.createMenu(null,
+            ninjapad.utils.link(
+                "Load ROM",
+                js="ninjapad.menu.uploadROM()",
+                hide=SINGLE_ROM
+            ),
+            ninjapad.utils.link(
+                "Save State",
+                js="ninjapad.menu.saveState()"
+            ),
+            ninjapad.utils.link(
+                "Load State",
+                js="ninjapad.menu.loadState()"
+            ),
+            ninjapad.utils.link(
+                "Options",
+                js="ninjapad.menu.options()"
+            ),
+            ninjapad.utils.link(
+                "Reset",
+                js="ninjapad.menu.reset()"
+            ),
+            ninjapad.utils.link(
+                "About",
+                js="ninjapad.menu.about()"
+            )
+        );
+    }
+
+    function showMenu(fnMenu) {
+        $("#pauseScreenContent").html(
+            fnMenu()
+        );
+        allowUserInteraction();
     }
 
     function openMainMenu() {
         ninjapad.pause.pauseEmulation(
-            ninjapad.utils.html("span", "pauseScreenContent", mainMenu())
+            ninjapad.utils.html(
+                "span", "pauseScreenContent", mainMenu()
+            )
         );
         allowUserInteraction();
         state.isOpen = true;
@@ -46,10 +98,7 @@ ninjapad.menu = function() {
 
     function returnToMainMenu(event) {
         event.stopPropagation();
-        $("#pauseScreenContent").html(
-            mainMenu()
-        );
-        allowUserInteraction();
+        showMenu(mainMenu);
     }
 
     return {
@@ -124,19 +173,33 @@ ninjapad.menu = function() {
             }
         },
 
-        showCredits: function() {
+        options: function() {
+            return showMenu(optionsMenu);
+        },
+
+        mainMenu: function() {
+            return showMenu(mainMenu);
+        },
+
+        about: function() {
             $("#pauseScreenContent").html(
                 ninjapad.utils.html("div", "about", ABOUT)
             );
             allowUserInteraction(returnToMainMenu)
         },
 
+        cycleIRState: function() {
+            iRState = ninjapad.utils.nextIndex(iRStates, iRState);
+        },
+
         toggleMenu: function() {
             if (!ninjapad.pause.state.cannotResume && state.isOpen) {
+                $("#menu").css("background-color", "darkred");
                 ninjapad.pause.resumeEmulation();
                 state.isOpen = false;
                 return;
             }
+            $("#menu").css("background-color", "red");
             openMainMenu();
         }
     }

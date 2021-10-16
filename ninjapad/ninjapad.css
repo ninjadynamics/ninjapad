@@ -192,29 +192,41 @@
 }
 
 .analogSwitchButton {
+    display: flex;
     position: absolute;
     left: 0%;
     top: 0%;
     width: 100%;
     height: 16%;
     box-sizing: border-box;
-    background-color: #666;
+    background-color: darkred;
     border: 1vw;
     border-style: outset;
     border-radius: 20%;
+    align-items: center;
+    justify-content: center;
+    font-family: monospace;
+    font-weight: bold;
+    color: white;
 }
 
 .menuButton {
+    display: flex;
     position: absolute;
     left: 0%;
     bottom: 0%;
     width: 100%;
     height: 16%;
     box-sizing: border-box;
-    background-color: #666;
+    background-color: darkred;
     border: 1vw;
     border-style: outset;
     border-radius: 20%;
+    align-items: center;
+    justify-content: center;
+    font-family: monospace;
+    font-weight: bold;
+    color: white;
 }
 
 .box {

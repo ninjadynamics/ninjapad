@@ -157,6 +157,10 @@ ninjapad.utils = function() {
 
         angle: function(dx, dy) {
             return Math.atan2(dy, dx);
+        },
+
+        nextIndex: function(a, i) {
+            return (i + 1) % a.length;
         }
     }
 }();
