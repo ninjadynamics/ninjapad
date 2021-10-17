@@ -195,13 +195,13 @@ ninjapad.gamepad = function() {
                 ninjapad.jQElement.dpad.hide();
                 ninjapad.jQElement.analog.show();
                 analogReset(ninjapad.jQElement.analog);
-                $("#analogSwitch").css("background-color", "red");
+                ninjapad.utils.changeButtonColor("#analogSwitch", "red", glow=true);
                 return;
             }
             analog.active = false;
             ninjapad.jQElement.analog.hide();
             ninjapad.jQElement.dpad.show();
-            $("#analogSwitch").css("background-color", "darkred");
+            ninjapad.utils.changeButtonColor("#analogSwitch", "#830000");            
         },
 
         toggleMenu: function(event) {

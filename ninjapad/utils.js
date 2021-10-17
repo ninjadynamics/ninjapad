@@ -161,6 +161,17 @@ ninjapad.utils = function() {
 
         nextIndex: function(a, i) {
             return (i + 1) % a.length;
+        },
+
+        changeButtonColor: function(e, c, glow=false) {
+            var obj = $(e);
+            obj.css("background-color", c);
+            obj.css("border-top-color", c);
+            obj.css("border-left-color", c);
+            obj.css("border-right-color", c);
+            obj.css("border-bottom-color", c);
+            obj.css("box-shadow", glow ? "0 0 8vh 0vh " + c : "");
+            obj.css("color", glow ? "white" : "gray");
         }
     }
 }();

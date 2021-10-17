@@ -194,12 +194,13 @@ ninjapad.menu = function() {
 
         toggleMenu: function() {
             if (!ninjapad.pause.state.cannotResume && state.isOpen) {
-                $("#menu").css("background-color", "darkred");
+                ninjapad.utils.changeButtonColor("#menu", "#830000");
+                $("#menu").css("color", "gray");
                 ninjapad.pause.resumeEmulation();
                 state.isOpen = false;
                 return;
             }
-            $("#menu").css("background-color", "red");
+            ninjapad.utils.changeButtonColor("#menu", "red", glow=true);            
             openMainMenu();
         }
     }

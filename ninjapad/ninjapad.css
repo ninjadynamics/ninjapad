@@ -103,7 +103,7 @@
     box-sizing: border-box;
     border-radius: 50%;
     background-color: transparent;
-    border: 2.5vw;
+    border-width: 2.5vw;
     border-style: inset;
 }
 
@@ -114,7 +114,7 @@
     box-sizing: border-box;
     border-radius: 50%;
     background-color: #666;
-    border: 2.5vw;
+    border-width: 2.5vw;
     border-style: outset;
 }
 
@@ -199,15 +199,20 @@
     width: 100%;
     height: 16%;
     box-sizing: border-box;
-    background-color: darkred;
-    border: 1vw;
+    border-width: 1vw;
     border-style: outset;
     border-radius: 20%;
+    background-color: #830000;
+    border-top-color: #830000;
+    border-left-color: #830000;
+    border-right-color: #830000;
+    border-bottom-color: #830000;
     align-items: center;
     justify-content: center;
     font-family: monospace;
     font-weight: bold;
-    color: white;
+    font-size: 2vh;
+    color: gray;
 }
 
 .menuButton {
@@ -218,15 +223,20 @@
     width: 100%;
     height: 16%;
     box-sizing: border-box;
-    background-color: darkred;
-    border: 1vw;
+    border-width: 1vw;
     border-style: outset;
     border-radius: 20%;
+    background-color: #830000;
+    border-top-color: #830000;
+    border-left-color: #830000;
+    border-right-color: #830000;
+    border-bottom-color: #830000;
     align-items: center;
     justify-content: center;
     font-family: monospace;
     font-weight: bold;
-    color: white;
+    font-size: 2vh;
+    color: gray;
 }
 
 .box {
@@ -237,7 +247,11 @@
 
 [id^="BUTTON"] {
     background-color: #BBB;
-    border: 1vw;
+    border-top-color: #BBB;
+    border-left-color: #BBB;
+    border-right-color: #BBB;
+    border-bottom-color: #BBB;
+    border-width: 1vw;
     border-style: outset;
 }
 
