@@ -190,18 +190,21 @@ ninjapad.gamepad = function() {
             }
             ninjapad.jQElement.analogSwitch.css("border-style", "outset");
 
+            var color_off = ninjapad.utils.getCSSVar("#analogSwitch", "color");
+            var color_on = ninjapad.utils.getCSSVar("#analogSwitch", "color_on");
+
             if (ninjapad.jQElement.analog.css("display") == "none") {
                 analog.active = true;
                 ninjapad.jQElement.dpad.hide();
                 ninjapad.jQElement.analog.show();
                 analogReset(ninjapad.jQElement.analog);
-                ninjapad.utils.changeButtonColor("#analogSwitch", "red", glow=true);
+                ninjapad.utils.changeButtonColor("#analogSwitch", color_on, glow=true);
                 return;
             }
             analog.active = false;
             ninjapad.jQElement.analog.hide();
             ninjapad.jQElement.dpad.show();
-            ninjapad.utils.changeButtonColor("#analogSwitch", "#830000");            
+            ninjapad.utils.changeButtonColor("#analogSwitch", color_off);
         },
 
         toggleMenu: function(event) {

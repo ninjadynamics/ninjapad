@@ -44,6 +44,7 @@ const ninjapad = {
             analog:         $("#ANALOG"),
             dpad:           $("#DPAD"),
             osd:            $("#OSD"),
+            rec:            $("#REC"),
             screen:         $("#" + SCREEN),
         };
 
@@ -57,6 +58,7 @@ const ninjapad = {
         ninjapad.layout.setPageLayout();
 
         // Assign function calls to touch events
+        ninjapad.utils.assignNoPropagation(ninjapad.menu.openRecMenu, "REC", "end");
         ninjapad.utils.assign(ninjapad.gamepad.toggleMenu, "menu", "start", "end");
         ninjapad.utils.assign(ninjapad.gamepad.analogSwitch, "analogSwitch", "start", "end");
         ninjapad.utils.assign(ninjapad.gamepad.buttonPress, "GAMEPAD-BUTTONS", "start", "move", "end");

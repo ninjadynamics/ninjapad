@@ -172,6 +172,10 @@ ninjapad.utils = function() {
             obj.css("border-bottom-color", c);
             obj.css("box-shadow", glow ? "0 0 8vh 0vh " + c : "");
             obj.css("color", glow ? "white" : "gray");
+        },
+
+        getCSSVar: function(e, v) {
+            return getComputedStyle($(e)[0]).getPropertyValue("--" + v);
         }
     }
 }();

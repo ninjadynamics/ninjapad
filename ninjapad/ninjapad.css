@@ -50,13 +50,23 @@
    text-decoration: none;
 }
 
+#REC {
+    display: none;
+    position: absolute;
+    background-color: red;
+    width: 6vmin;
+    height: 6vmin;
+    opacity: 0.5;
+    border-radius: 50%;
+}
+
 #DEADZONE {
     background: #444;
 }
 
 .dirButtons {
     position: absolute;
-    left: 4%;
+    left: 4vw;
     top: 10vw;
     width: 35vw;
     height: 35vw;
@@ -67,7 +77,7 @@
 
 .actionButtons {
     position: absolute;
-    right: 4%;
+    right: 4vw;
     top: 10vw;
     width: 35vw;
     height: 35vw;
@@ -78,7 +88,7 @@
 
 .middleButtons {
     position: absolute;
-    left: 45%;
+    left: 45vw;
     top: 10vw;
     width: 10vw;
     height: 35vw;
@@ -192,6 +202,8 @@
 }
 
 .analogSwitchButton {
+    --color_off: #830000;
+    --color_on: red;
     display: flex;
     position: absolute;
     left: 0%;
@@ -202,20 +214,16 @@
     border-width: 1vw;
     border-style: outset;
     border-radius: 20%;
-    background-color: #830000;
-    border-top-color: #830000;
-    border-left-color: #830000;
-    border-right-color: #830000;
-    border-bottom-color: #830000;
-    align-items: center;
-    justify-content: center;
-    font-family: monospace;
-    font-weight: bold;
-    font-size: 2vh;
-    color: gray;
+    background-color: var(--color_off);
+    border-top-color: var(--color_off);
+    border-left-color: var(--color_off);
+    border-right-color: var(--color_off);
+    border-bottom-color: var(--color_off);
 }
 
 .menuButton {
+    --color_off: #830000;
+    --color_on: red;
     display: flex;
     position: absolute;
     left: 0%;
@@ -226,17 +234,11 @@
     border-width: 1vw;
     border-style: outset;
     border-radius: 20%;
-    background-color: #830000;
-    border-top-color: #830000;
-    border-left-color: #830000;
-    border-right-color: #830000;
-    border-bottom-color: #830000;
-    align-items: center;
-    justify-content: center;
-    font-family: monospace;
-    font-weight: bold;
-    font-size: 2vh;
-    color: gray;
+    background-color: var(--color_off);
+    border-top-color: var(--color_off);
+    border-left-color: var(--color_off);
+    border-right-color: var(--color_off);
+    border-bottom-color: var(--color_off);
 }
 
 .box {
@@ -246,13 +248,14 @@
 }
 
 [id^="BUTTON"] {
-    background-color: #BBB;
-    border-top-color: #BBB;
-    border-left-color: #BBB;
-    border-right-color: #BBB;
-    border-bottom-color: #BBB;
-    border-width: 1vw;
+    --color: #BBB;
+    background-color: var(--color);
+    border-top-color: var(--color);
+    border-left-color: var(--color);
+    border-right-color: var(--color);
+    border-bottom-color: var(--color);
     border-style: outset;
+    border-width: 1vw;
 }
 
 @font-face {

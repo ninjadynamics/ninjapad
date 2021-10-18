@@ -5,6 +5,8 @@ ninjapad.layout = function() {
     var coldStart = true;
 
     function setOSDLayout() {
+        // Setup menu screen
+        var osd = ninjapad.jQElement.osd;
         ninjapad.jQElement.osd.empty();
         ninjapad.jQElement.osd.detach().appendTo(ninjapad.jQElement.screen);
         ninjapad.jQElement.osd.css("top", 0);
@@ -13,6 +15,11 @@ ninjapad.layout = function() {
         ninjapad.jQElement.osd.css("width", ninjapad.jQElement.screen.width());
         ninjapad.jQElement.osd.css("visibility", ninjapad.pause.pauseScreen.visibility);
         ninjapad.jQElement.osd.append(ninjapad.pause.pauseScreen.content);
+
+        // Setup REC menu button
+        var offset = `${ninjapad.jQElement.screen.width() * 0.06}px`;
+        ninjapad.jQElement.rec.css("right", offset);
+        ninjapad.jQElement.rec.css("bottom", offset);
     }
 
     function setEmulationScreenLayout() {
@@ -53,6 +60,7 @@ ninjapad.layout = function() {
             $("body").removeAttr("style").css("margin", "0%");
             setEmulationScreenLayout();
             ninjapad.jQElement.screen.detach().appendTo("#SCREEN");
+            $("#REC").detach().appendTo(ninjapad.jQElement.screen);
             $("body *").not("#ninjaPad *").not("#ninjaPad").remove();
             coldStart = false;
         }

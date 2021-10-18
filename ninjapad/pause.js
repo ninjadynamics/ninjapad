@@ -41,7 +41,7 @@ ninjapad.pause = function() {
             pauseScreen.visibility = "hidden";
             ninjapad.jQElement.osd.css("visibility", pauseScreen.visibility);
             state.isEmulationPaused = false;
-            ninjapad.menu.state.isOpen = false;
+            ninjapad.menu.close();
             DEBUG && console.log("NinjaPad: Emulation resumed");
         }
     };
