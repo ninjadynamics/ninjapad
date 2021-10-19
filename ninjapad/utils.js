@@ -67,20 +67,22 @@ ninjapad.utils = function() {
             }
         },
 
-        html: function(obj, id, text) {
-            return `<${obj} id='${id}'>${text}</${obj}>`;
+        html: function(obj, id, content) {
+            var style = "margin: 0 auto; display: inline-block; transform: translateZ(0);"
+            return `<${obj} id="${id}" style="${style}">${content}</${obj}>`;
         },
 
         link: function(content, js, hide) {
-            js = `${js}; return false;`;
+            var js = `${js}; return false;`;
             return hide || `<a href="#" onclick="${js}">${content}</a>`;
         },
 
         createMenu: function(title, ...opts) {
-            opts = opts.filter(e => e !== true);
-            title = title ? `${title}<br/>` : "";
+            var opts = opts.filter(e => e !== true);
+            var title = title ? `${title}<br/>` : "";
+            var style = "line-height: 2.2em; margin: 0 auto; display: inline-block; transform: translateZ(0);"
             return (
-                `<div style="line-height: 2.2em;">
+                `<div style="${style}">
                     ${title}
                     ${opts.join("<br/>")}
                 </div>`
