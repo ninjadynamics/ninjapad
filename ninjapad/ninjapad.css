@@ -10,13 +10,13 @@
 }
 
 #OSD {
+    display: flex;
     position: absolute;
     text-align: center;
-    display: flex;
     justify-content: center;
     align-content: center;
     flex-direction: column;
-    font-family: KarmaticArcade;
+    font-family: Karmatic Arcade;
     font-size: 5vmin;
     box-sizing: border-box;
     padding: 2em;
@@ -50,14 +50,28 @@
    text-decoration: none;
 }
 
-#REC {
-    display: none;
+#REC_MENU {
+    display: flex;
     position: absolute;
-    background-color: red;
-    width: 6vmin;
-    height: 6vmin;
-    opacity: 0.5;
-    border-radius: 50%;
+    justify-content: right;
+    align-items: center;
+    font-size: 5vmin;
+    font-family: VCR OSD Mono;
+    color: white;
+    background-color: black;
+    padding: 1vmin;
+}
+
+#REC_STATUS {
+    display: flex;
+    position: absolute;
+    justify-content: left;
+    align-items: center;
+    font-size: 5vmin;
+    font-family: VCR OSD Mono;
+    color: white;
+    background-color: black;
+    padding: 1vmin;
 }
 
 #DEADZONE {
@@ -259,7 +273,15 @@
 }
 
 @font-face {
-    font-family: 'KarmaticArcade';
+    font-family: 'VCR OSD Mono';
+    src: url('res/VCR_OSD_MONO.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+
+@font-face {
+    font-family: 'Karmatic Arcade';
     src: url('res/ka1.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;

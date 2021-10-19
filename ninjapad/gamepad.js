@@ -207,14 +207,14 @@ ninjapad.gamepad = function() {
             ninjapad.utils.changeButtonColor("#analogSwitch", color_off);
         },
 
-        toggleMenu: function(event) {
+        toggleMainMenu: function(event) {
             event.preventDefault();
             if (event.type == "touchstart") {
                 ninjapad.jQElement.menu.css("border-style", "inset");
                 return;
             }
             ninjapad.jQElement.menu.css("border-style", "outset");
-            ninjapad.menu.toggleMenu();
+            ninjapad.menu.toggle.mainMenu();
         },
 
         // Doesn't work on iOS

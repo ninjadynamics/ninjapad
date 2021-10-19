@@ -2,13 +2,13 @@
 // Creative Commons Attribution 4.0 International Public License
 
 ninjapad.menu = function() {
-    const iRStates = [
+    const iRModes = [
         "OFF",
         "ON-R",
         "ON-S"
     ];
 
-    var iRState = 0;
+    var iRMode = 0;
 
     var state = { isOpen: false };
 
@@ -41,21 +41,21 @@ ninjapad.menu = function() {
         return ninjapad.utils.createMenu(null,
             ninjapad.utils.link(
                 isStopped && !hasData ? "Start" : "Restart",
-                js="ninjapad.recorder.start(); ninjapad.jQElement.rec.css('opacity', '1.0')"
+                js="ninjapad.menu.inputRecorder.start();"
             ),
             ninjapad.utils.link(
                 "Play",
-                js="ninjapad.recorder.play();",
+                js="ninjapad.menu.inputRecorder.play();",
                 hide=!hasData
             ),
             ninjapad.utils.link(
                 "Stop",
-                js="ninjapad.recorder.stop(ninjapad.menu.recorder); ninjapad.jQElement.rec.css('opacity', '0.5')",
+                js="ninjapad.menu.inputRecorder.stop()",
                 hide=(status == states.STOP)
             ),
             ninjapad.utils.link(
                 "Clear",
-                js="ninjapad.recorder.clear(ninjapad.menu.recorder)",
+                js="ninjapad.menu.inputRecorder.clear()",
                 hide=!hasData
             ),
             ninjapad.utils.link(
@@ -75,9 +75,9 @@ ninjapad.menu = function() {
             ninjapad.utils.link("Import save data"),
             ninjapad.utils.link("Export save data"),
             ninjapad.utils.link(
-                `Input recorder ${inColor("lime", iRStates[iRState])}`,
-                js=`ninjapad.menu.cycleIRState();
-                    ninjapad.menu.options()`
+                `Input recorder ${inColor("lime", iRModes[iRMode])}`,
+                js=`ninjapad.menu.inputRecorder.cycleMode();
+                    ninjapad.menu.show.optionsMenu()`
             )
         );
     }
@@ -99,7 +99,7 @@ ninjapad.menu = function() {
             ),
             ninjapad.utils.link(
                 "Options",
-                js="ninjapad.menu.options()"
+                js="ninjapad.menu.show.optionsMenu()"
             ),
             ninjapad.utils.link(
                 "Reset",
@@ -214,16 +214,14 @@ ninjapad.menu = function() {
             }
         },
 
-        recorder: function() {
-            return showMenu(recMenu);
-        },
+        show: {
+            recorderMenu: function() {
+                return showMenu(recMenu);
+            },
 
-        options: function() {
-            return showMenu(optionsMenu, returnToMainMenu);
-        },
-
-        mainMenu: function() {
-            return showMenu(mainMenu);
+            optionsMenu: function() {
+                return showMenu(optionsMenu, returnToMainMenu);
+            }
         },
 
         about: function() {
@@ -233,30 +231,92 @@ ninjapad.menu = function() {
             allowUserInteraction(returnToMainMenu)
         },
 
-        cycleIRState: function() {
-            iRState = ninjapad.utils.nextIndex(iRStates, iRState);
-            iRState ? ninjapad.jQElement.rec.show() : ninjapad.jQElement.rec.hide();
-        },
-
-        openRecMenu: function(event) {
-            if (event) event.stopPropagation();
-            var color_on = ninjapad.utils.getCSSVar("#menu", "color_on");
-            ninjapad.utils.changeButtonColor("#menu", color_on, glow=true);
-            openMenu(recMenu);
-        },
-
-        toggleMenu: function() {
-            if (!ninjapad.pause.state.cannotResume && state.isOpen) {
-                closeMenuAndResumeEmulation();
-                return;
+        open: {
+            inputRecorder: function(event) {
+                if (event) event.stopPropagation();
+                var color_on = ninjapad.utils.getCSSVar("#menu", "color_on");
+                ninjapad.utils.changeButtonColor("#menu", color_on, glow=true);
+                openMenu(recMenu);
             }
-            var color_on = ninjapad.utils.getCSSVar("#menu", "color_on");
-            ninjapad.utils.changeButtonColor("#menu", color_on, glow=true);
-            openMenu(mainMenu);
         },
 
         close: function() {
             closeMenuAndResumeEmulation();
+        },
+
+        toggle: {
+            mainMenu: function() {
+                if (!ninjapad.pause.state.cannotResume && state.isOpen) {
+                    closeMenuAndResumeEmulation();
+                    return;
+                }
+                var color_on = ninjapad.utils.getCSSVar("#menu", "color_on");
+                ninjapad.utils.changeButtonColor("#menu", color_on, glow=true);
+                openMenu(mainMenu);
+            }
+        },
+
+        inputRecorder: {
+            ready: function() {
+                ninjapad.jQElement.recStatus.html(`
+                    <div>READY</div>
+                `);
+            },
+
+            start: function() {
+                var secs = 3;
+                memoryHash = undefined;
+                ninjapad.pause.pauseEmulation(
+                    ninjapad.utils.html(
+                        "span", "pauseScreenContent", "3"
+                    )
+                );
+                function _start() {
+                    $("#pauseScreenContent").html(--secs);
+                    if (secs) return;
+                    clearInterval(startID);
+                    ninjapad.recorder.start();
+                    ninjapad.jQElement.recStatus.html(`
+                        <div style="font-size: 3vmin;">🔴</div>
+                        <div>&nbsp;REC</div>
+                    `);
+                }
+                var secs = 3;
+                var startID = setInterval(_start, 1000);
+            },
+
+            stop: function() {
+                ninjapad.menu.inputRecorder.ready();
+                ninjapad.recorder.setCallback("stop", ninjapad.menu.show.recorderMenu);
+                ninjapad.recorder.stop();
+            },
+
+            play: function() {
+                ninjapad.jQElement.recStatus.html(`
+                    <div style="font-size: 5vmin; color: lime">▶</div>
+                    <div>&nbsp;PLAY</div>
+                `);
+                ninjapad.recorder.setCallback("play", ninjapad.menu.inputRecorder.ready);
+                ninjapad.recorder.play();
+            },
+
+            clear: function() {
+                ninjapad.menu.inputRecorder.ready();
+                ninjapad.recorder.setCallback("clear", ninjapad.menu.show.recorderMenu);
+                ninjapad.recorder.clear();
+            },
+
+            cycleMode: function() {
+                iRMode = ninjapad.utils.nextIndex(iRModes, iRMode);
+                if (iRMode) {
+                    ninjapad.jQElement.recMenu.show();
+                    ninjapad.jQElement.recStatus.show();
+                }
+                else {
+                    ninjapad.jQElement.recMenu.hide();
+                    ninjapad.jQElement.recStatus.hide();
+                }
+            }
         }
     }
 }();

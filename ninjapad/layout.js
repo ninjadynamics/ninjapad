@@ -18,8 +18,11 @@ ninjapad.layout = function() {
 
         // Setup REC menu button
         var offset = `${ninjapad.jQElement.screen.width() * 0.06}px`;
-        ninjapad.jQElement.rec.css("right", offset);
-        ninjapad.jQElement.rec.css("bottom", offset);
+        ninjapad.jQElement.recMenu.css("right", offset);
+        ninjapad.jQElement.recMenu.css("bottom", offset);
+        ninjapad.jQElement.recStatus.css("left", offset);
+        ninjapad.jQElement.recStatus.css("bottom", offset);
+
     }
 
     function setEmulationScreenLayout() {
@@ -60,7 +63,8 @@ ninjapad.layout = function() {
             $("body").removeAttr("style").css("margin", "0%");
             setEmulationScreenLayout();
             ninjapad.jQElement.screen.detach().appendTo("#SCREEN");
-            $("#REC").detach().appendTo(ninjapad.jQElement.screen);
+            $("#REC_MENU").detach().appendTo(ninjapad.jQElement.screen);
+            $("#REC_STATUS").detach().appendTo(ninjapad.jQElement.screen);
             $("body *").not("#ninjaPad *").not("#ninjaPad").remove();
             coldStart = false;
         }

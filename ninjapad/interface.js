@@ -340,6 +340,17 @@ ninjapad.interface = {
                 buttonUp(b);
             },
 
+            releaseAllButtons: function() {
+                buttonUp("BUTTON_UP");
+                buttonUp("BUTTON_DOWN");
+                buttonUp("BUTTON_LEFT");
+                buttonUp("BUTTON_RIGHT");
+                buttonUp("BUTTON_SELECT");
+                buttonUp("BUTTON_START");
+                buttonUp("BUTTON_A");
+                buttonUp("BUTTON_B");
+            },
+
             pause: function() {
                 function _pause() {
                     if (nes.break) return;

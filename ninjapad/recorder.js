@@ -2,12 +2,14 @@
 // Creative Commons Attribution 4.0 International Public License
 
 ninjapad.recorder = function() {
+    const fnCallback = {};
     const states = {
         STOP  : 0,
         PAUSE : 1,
         PLAY  : 2,
         REC   : 3
     }
+
     var status = states.STOP;
     var userInput;
     var inputIndex;
@@ -18,12 +20,30 @@ ninjapad.recorder = function() {
     var fnButtonPress;
     var memoryHash;
 
+    function execute(callback) {
+        console.log(callback);
+        if (!callback) return;
+        callback.fn(
+            ...callback.args
+        );
+    }
+
     return {
         initialize: function(fnButtonUp, fnButtonDown) {
             fnButtonPress = {
                 false: fnButtonUp,
                 true: fnButtonDown
             }
+            ninjapad.recorder.setCallback(
+                "stop", ninjapad.pause.pauseEmulation
+            );
+        },
+
+        setCallback: function(key, fn, ...args) {
+            fnCallback[key] = {
+                fn: fn,
+                args: args
+            };
         },
 
         hasData: function() {
@@ -31,8 +51,12 @@ ninjapad.recorder = function() {
         },
 
         clear: function(callback) {
+            if (status == states.PLAY) {
+                ninjapad.emulator.releaseAllButtons();
+            }
             memoryHash = undefined;
-            if (callback) callback();
+            status = states.STOP;
+            execute(fnCallback.clear);
         },
 
         states: function() {
@@ -44,38 +68,33 @@ ninjapad.recorder = function() {
         },
 
         start: function() {
-            var secs = 3;
             memoryHash = undefined;
-            ninjapad.pause.pauseEmulation(
-                ninjapad.utils.html(
-                    "span", "pauseScreenContent", "3"
-                )
-            );
-            function _start() {
-                $("#pauseScreenContent").html(--secs);
-                if (secs) return;
-                clearInterval(startID);
-                ninjapad.emulator.resetFrameCount();
-                saveData = ninjapad.emulator.saveState();
-                lastFrame = 0; endFrame = lastFrame;
-                userInput = []; writeBuffer = [];
-                status = states.REC;
-                ninjapad.pause.resumeEmulation();
-            }
-            var startID = setInterval(_start, 1000);
+            ninjapad.emulator.pause();
+            ninjapad.emulator.resetFrameCount();
+            saveData = ninjapad.emulator.saveState();
+            lastFrame = 0; endFrame = lastFrame;
+            userInput = []; writeBuffer = [];
+            status = states.REC;
+            ninjapad.pause.resumeEmulation();
         },
 
-        stop: function(callback=ninjapad.pause.pauseEmulation) {
-            ninjapad.emulator.pause();
-            var memory = ninjapad.emulator.memory();
-            memoryHash = sha256(memory);
+        stop: function() {
+            if (status == states.PLAY) {
+                ninjapad.emulator.releaseAllButtons();
+            }
+            else {
+                ninjapad.emulator.pause();
+                var memory = ninjapad.emulator.memory();
+                memoryHash = sha256(memory);
+            }
             status = states.STOP;
-            callback();
+            execute(fnCallback.stop);
         },
 
         play: function() {
             if (!endFrame) return;
             // - - - - - - - - - - - - - - - - - - - - - - - -
+            ninjapad.emulator.releaseAllButtons();
             ninjapad.pause.pauseEmulation();
             ninjapad.emulator.resetFrameCount();
             ninjapad.emulator.loadState(saveData);
@@ -114,6 +133,7 @@ ninjapad.recorder = function() {
                         "Playback " + (result ? "OK" : "ERROR")
                     )
                 );
+                execute(fnCallback.play);
             }
             return true;
         },

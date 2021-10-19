@@ -44,7 +44,8 @@ const ninjapad = {
             analog:         $("#ANALOG"),
             dpad:           $("#DPAD"),
             osd:            $("#OSD"),
-            rec:            $("#REC"),
+            recMenu:        $("#REC_MENU"),
+            recStatus:      $("#REC_STATUS"),
             screen:         $("#" + SCREEN),
         };
 
@@ -58,8 +59,8 @@ const ninjapad = {
         ninjapad.layout.setPageLayout();
 
         // Assign function calls to touch events
-        ninjapad.utils.assignNoPropagation(ninjapad.menu.openRecMenu, "REC", "end");
-        ninjapad.utils.assign(ninjapad.gamepad.toggleMenu, "menu", "start", "end");
+        ninjapad.utils.assignNoPropagation(ninjapad.menu.open.inputRecorder, "REC_MENU", "end");
+        ninjapad.utils.assign(ninjapad.gamepad.toggleMainMenu, "menu", "start", "end");
         ninjapad.utils.assign(ninjapad.gamepad.analogSwitch, "analogSwitch", "start", "end");
         ninjapad.utils.assign(ninjapad.gamepad.buttonPress, "GAMEPAD-BUTTONS", "start", "move", "end");
         ninjapad.utils.assign(ninjapad.gamepad.analogTouch, "ANALOG_STICK", "start", "move", "end");
@@ -91,7 +92,7 @@ $(document).ready(async function() {
 
     // Use ESC key to open the menu
     $(window).keyup(function(e) {
-      if (e.code == "Escape") ninjapad.menu.toggleMenu();
+      if (e.code == "Escape") ninjapad.menu.toggle.mainMenu();
     });
 
     // Load a ROM and setup the page layout
