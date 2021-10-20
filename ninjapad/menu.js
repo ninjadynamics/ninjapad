@@ -8,7 +8,7 @@ ninjapad.menu = function() {
         "ON-S"
     ];
 
-    var iRMode = 0;
+    var iRMode = 2;
 
     var state = { isOpen: false };
 
