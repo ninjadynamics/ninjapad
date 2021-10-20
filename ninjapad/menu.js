@@ -195,6 +195,7 @@ ninjapad.menu = function() {
                 reader.onload = function () {
                     try {
                         ninjapad.emulator.loadROMData(reader.result);
+                        ninjapad.menu.inputRecorder.ready();
                         ninjapad.recorder.clear();
                         closeMenuAndResumeEmulation();
                     }
@@ -264,6 +265,7 @@ ninjapad.menu = function() {
                 var secs = 3;
                 memoryHash = undefined;
                 ninjapad.pause.pauseEmulation(secs);
+                preventUserInteraction();
                 function _start() {
                     ninjapad.pause.setScreenContent(--secs);
                     if (secs) return;
