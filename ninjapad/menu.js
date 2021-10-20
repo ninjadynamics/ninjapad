@@ -60,11 +60,11 @@ ninjapad.menu = function() {
             ),
             ninjapad.utils.link(
                 "Import",
-                js="ninjapad.recorder.import()"
+                js="ninjapad.menu.error('Not implemented yet')"
             ),
             ninjapad.utils.link(
                 "Export",
-                js="ninjapad.recorder.import()",
+                js="ninjapad.recorder.export()",
                 hide=!hasData
             )
         );
@@ -72,8 +72,14 @@ ninjapad.menu = function() {
 
     function optionsMenu() {
         return ninjapad.utils.createMenu(null,
-            ninjapad.utils.link("Import save data"),
-            ninjapad.utils.link("Export save data"),
+            ninjapad.utils.link(
+                "Import save data",
+                js="ninjapad.menu.error('Not implemented yet')"
+            ),
+            ninjapad.utils.link(
+                "Export save data",
+                js="ninjapad.menu.error('Not implemented yet')"
+            ),
             ninjapad.utils.link(
                 `Input recorder ${inColor("lime", iRModes[iRMode])}`,
                 js=`ninjapad.menu.inputRecorder.cycleMode();
@@ -254,7 +260,19 @@ ninjapad.menu = function() {
             }
         },
 
+        error: function(msg) {
+            showError(msg);
+        },
+
         inputRecorder: {
+            show: function() {
+                ninjapad.jQElement.recMenu.html(`
+                    <div><a href="#" onclick="ninjapad.menu.open.inputRecorder();">
+                        VCR MENU
+                    </a></div>
+                `);
+            },
+
             ready: function() {
                 ninjapad.jQElement.recStatus.html(`
                     <div>READY</div>

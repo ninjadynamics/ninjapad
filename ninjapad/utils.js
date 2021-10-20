@@ -98,6 +98,7 @@ ninjapad.utils = function() {
             // Assign function call to events
             for (const e of touchEvents) {
                 eval("element.ontouch" + e + " = fn");
+                //if (e == "end") element.onclick = fn;
             }
         },
 
@@ -110,6 +111,7 @@ ninjapad.utils = function() {
             // Assign function call to events
             for (const e of touchEvents) {
                 eval("element.ontouch" + e + " = fn");
+                //if (e == "end") element.onclick = fn;
             }
         },
 

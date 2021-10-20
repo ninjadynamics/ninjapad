@@ -59,7 +59,7 @@ const ninjapad = {
         ninjapad.layout.setPageLayout();
 
         // Assign function calls to touch events
-        ninjapad.utils.assignNoPropagation(ninjapad.menu.open.inputRecorder, "REC_MENU", "end");
+        //ninjapad.utils.assignNoPropagation(ninjapad.menu.open.inputRecorder, "REC_MENU", "end");
         ninjapad.utils.assign(ninjapad.gamepad.toggleMainMenu, "menu", "start", "end");
         ninjapad.utils.assign(ninjapad.gamepad.analogSwitch, "analogSwitch", "start", "end");
         ninjapad.utils.assign(ninjapad.gamepad.buttonPress, "GAMEPAD-BUTTONS", "start", "move", "end");

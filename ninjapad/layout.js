@@ -16,13 +16,14 @@ ninjapad.layout = function() {
         ninjapad.jQElement.osd.css("visibility", ninjapad.pause.pauseScreen.visibility);
         ninjapad.jQElement.osd.append(ninjapad.pause.pauseScreen.content);
 
-        // Setup REC menu button
+        // Setup input recorder menu and status
         var offset = `${ninjapad.jQElement.screen.width() * 0.06}px`;
         ninjapad.jQElement.recMenu.css("right", offset);
         ninjapad.jQElement.recMenu.css("bottom", offset);
         ninjapad.jQElement.recStatus.css("left", offset);
         ninjapad.jQElement.recStatus.css("bottom", offset);
-
+        ninjapad.menu.inputRecorder.show();
+        ninjapad.menu.inputRecorder.ready();
     }
 
     function setEmulationScreenLayout() {
@@ -52,6 +53,11 @@ ninjapad.layout = function() {
         }
         ninjapad.jQElement.gamepad.height("0%");
         ninjapad.jQElement.controller.hide();
+
+        $("#REC_MENU").detach().appendTo(ninjapad.jQElement.screen);
+        $("#REC_STATUS").detach().appendTo(ninjapad.jQElement.screen);
+        var fontSize = `${ninjapad.jQElement.screen.width() * 0.05}px`;
+        ninjapad.jQElement.osd.css("font-size", fontSize);        
     }
 
     function setMobileLayout() {
