@@ -10,6 +10,12 @@ ninjapad.utils = function() {
         return this.replace(RegExp("^[" + escaped + "]+|[" + escaped + "]+$", "gm"), '');
     };
 
+    Array.prototype.sortBy = function(p) {
+        return this.slice(0).sort(function(a,b) {
+            return (a[p] > b[p]) ? 1 : (a[p] < b[p]) ? -1 : 0;
+        });
+    };
+
     return {
 
         preventDefaultWithoutPropagation: function(event) {
@@ -180,6 +186,10 @@ ninjapad.utils = function() {
 
         getCSSVar: function(e, v) {
             return getComputedStyle($(e)[0]).getPropertyValue("--" + v);
+        },
+
+        inBinary: function(v) {
+            return v.toString(2).padStart(8, "0");
         }
     }
 }();
