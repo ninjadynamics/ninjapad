@@ -32,6 +32,7 @@ ninjapad.recorder = function() {
     var fnButtonPress;
     var initialState;
     var finalState;
+    var romHash;
 
     function execute(callback) {
         console.log(callback);
@@ -39,6 +40,12 @@ ninjapad.recorder = function() {
         callback.fn(
             ...callback.args
         );
+    }
+
+    function error(msg) {
+        DEBUG && console.log(`NinjaPad: ${msg}`);
+        ninjapad.pause.pauseEmulation(msg);
+        return false;
     }
 
     return {
@@ -88,8 +95,10 @@ ninjapad.recorder = function() {
             ninjapad.emulator.pause();
             ninjapad.emulator.resetFrameCount();
             saveData = ninjapad.emulator.saveState();
-            var memorySnapshot = ninjapad.emulator.memory();
-            initialState = sha256(memorySnapshot);
+            const romData = ninjapad.emulator.getROMData();
+            const snapshot = ninjapad.emulator.memory();
+            romHash = sha256(romData);
+            initialState = sha256(snapshot);
             finalState = undefined;
             lastFrame = 0; endFrame = lastFrame;
             userInput = []; writeBuffer = [];
@@ -103,24 +112,34 @@ ninjapad.recorder = function() {
             }
             else {
                 ninjapad.emulator.pause();
-                var memorySnapshot = ninjapad.emulator.memory();
-                finalState = sha256(memorySnapshot);
+                const snapshot = ninjapad.emulator.memory();
+                finalState = sha256(snapshot);
             }
             status = states.STOP;
             execute(fnCallback.stop);
         },
 
         play: function() {
-            if (!endFrame) return;
-            // - - - - - - - - - - - - - - - - - - - - - - - -
-            ninjapad.emulator.releaseAllButtons();
+            if (!endFrame) {
+                return error("No input data");
+            }
+            // - - - - - - - - - - - - - - - - - - - - - -
+            const hash = sha256(ninjapad.emulator.getROMData());
+            if (hash != romHash) {
+                return error("ROM file/hash mismatch");
+            }
+            // - - - - - - - - - - - - - - - - - - - - - -
             ninjapad.pause.pauseEmulation();
-            ninjapad.emulator.resetFrameCount();
+            ninjapad.emulator.releaseAllButtons();
+            const backup = ninjapad.emulator.saveState();
             ninjapad.emulator.loadState(saveData);
-            var memorySnapshot = ninjapad.emulator.memory();
-            if (initialState != sha256(memorySnapshot)) {
-                console.log("Oops!!");
-            };
+            const snapshot = ninjapad.emulator.memory();
+            if (initialState != sha256(snapshot)) {
+                ninjapad.emulator.loadState(backup);
+                return error("Memory snapshot mismatch");
+            }
+            // - - - - - - - - - - - - - - - - - - - - - -
+            ninjapad.emulator.resetFrameCount();
             ninjapad.pause.resumeEmulation();
             inputIndex = 0; lastFrame = 0;
             status = states.PLAY;
@@ -241,7 +260,6 @@ ninjapad.recorder = function() {
                     i = buttonArray.indexOf(button.id);
                     button.pressed ? currByte |= 1 << i : currByte &= ~(1 << i);
                 }
-                console.log(currByte.toString(2).padStart(8, "0"))
                 var offset = frame.offset;
                 while (offset > 0xFF) {
                     data.push(0xFF);
@@ -256,7 +274,8 @@ ninjapad.recorder = function() {
                 saveData: [...saveData],
                 initialState: initialState,
                 finalState: finalState,
-                endFrame: endFrame
+                endFrame: endFrame,
+                romHash: romHash
             };
         },
 

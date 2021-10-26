@@ -64,7 +64,7 @@ ninjapad.menu = function() {
             ),
             ninjapad.utils.link(
                 "Export",
-                js="ninjapad.recorder.export()",
+                js="ninjapad.menu.inputRecorder.export()",
                 hide=!hasData
             )
         );
@@ -317,6 +317,15 @@ ninjapad.menu = function() {
                 ninjapad.menu.inputRecorder.ready();
                 ninjapad.recorder.setCallback("clear", ninjapad.menu.show.recorderMenu);
                 ninjapad.recorder.clear();
+            },
+
+            export: function() {
+                const data = ninjapad.recorder.export();
+                const name = data.romHash.substring(48);
+                ninjapad.utils.downloadBlob(
+                    JSON.stringify(data),
+                    name, "application/json"
+                );
             },
 
             cycleMode: function() {

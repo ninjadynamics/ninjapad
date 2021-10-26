@@ -190,6 +190,27 @@ ninjapad.utils = function() {
 
         inBinary: function(v) {
             return v.toString(2).padStart(8, "0");
+        },
+
+        downloadBlob: function(data, fileName, mimeType) {
+            function downloadURL(data, fileName) {
+                var a;
+                a = document.createElement('a');
+                a.href = data;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.style = 'display: none';
+                a.click();
+                a.remove();
+            }
+            var blob = new Blob(
+                [data], { type: mimeType }
+            );
+            var url = window.URL.createObjectURL(blob);
+            downloadURL(url, fileName);
+            setTimeout(function() {
+            return window.URL.revokeObjectURL(url);
+            }, 1000);
         }
     }
 }();
