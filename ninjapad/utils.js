@@ -2,7 +2,7 @@ ninjapad.utils = function() {
     const TOUCH_EVENTS = ["start", "move", "end"];
 
     Number.prototype.mod = function(n) {
-        return ((this%n)+n)%n;
+        return ((this % n) + n) % n;
     };
 
     String.prototype.strip = function (string) {
@@ -15,6 +15,10 @@ ninjapad.utils = function() {
             return (a[p] > b[p]) ? 1 : (a[p] < b[p]) ? -1 : 0;
         });
     };
+
+    fflate.objFromU8 = function(uint8Array) {
+        return JSON.parse(fflate.strFromU8(uint8Array));
+    }
 
     return {
 
@@ -211,6 +215,12 @@ ninjapad.utils = function() {
             setTimeout(function() {
             return window.URL.revokeObjectURL(url);
             }, 1000);
+        },
+
+        pop: function(obj, key) {
+            const value = obj[key];
+            delete obj[key];
+            return value;
         }
     }
 }();

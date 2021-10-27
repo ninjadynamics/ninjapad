@@ -1,7 +1,12 @@
 // 2021 Ninja Dynamics
 // Creative Commons Attribution 4.0 International Public License
-
+var TMP;
 ninjapad.menu = function() {
+
+    const pop = ninjapad.utils.pop;
+
+    const state = { isOpen: false };
+
     const iRModes = [
         "OFF",
         "ON-R",
@@ -9,8 +14,6 @@ ninjapad.menu = function() {
     ];
 
     var iRMode = 2;
-
-    var state = { isOpen: false };
 
     function inColor(color, text) {
         return `<font color='${color}'>${text}</font>`;
@@ -60,7 +63,7 @@ ninjapad.menu = function() {
             ),
             ninjapad.utils.link(
                 "Import",
-                js="ninjapad.menu.error('Not implemented yet')"
+                js="ninjapad.menu.inputRecorder.import()"
             ),
             ninjapad.utils.link(
                 "Export",
@@ -182,13 +185,15 @@ ninjapad.menu = function() {
 
         reset: function() {
             ninjapad.emulator.reloadROM();
+            ninjapad.menu.inputRecorder.ready();
+            ninjapad.recorder.clear();
             closeMenuAndResumeEmulation();
         },
 
         uploadROM: function() {
-            ninjapad.jQElement.upload.trigger("click");
+            ninjapad.jQElement.uploadROM.trigger("click");
 
-            const inputElement = document.getElementById("upload");
+            const inputElement = document.getElementById("uploadROM");
             inputElement.addEventListener("change", handleFiles, false);
 
             function handleFiles() {
@@ -196,8 +201,8 @@ ninjapad.menu = function() {
                 if (ninjapad.emulator.isROMLoaded()) {
                     saveData = ninjapad.emulator.saveState();
                 }
-                let f = document.getElementById('upload').files[0];
-                let reader = new FileReader();
+                const f = inputElement.files[0];
+                const reader = new FileReader();
                 reader.onload = function () {
                     try {
                         ninjapad.emulator.loadROMData(reader.result);
@@ -294,7 +299,6 @@ ninjapad.menu = function() {
                         <div>&nbsp;REC</div>
                     `);
                 }
-                var secs = 3;
                 var startID = setInterval(_start, 1000);
             },
 
@@ -319,12 +323,54 @@ ninjapad.menu = function() {
                 ninjapad.recorder.clear();
             },
 
+            import: function() {
+                ninjapad.jQElement.uploadRec.trigger("click");
+
+                const inputElement = document.getElementById("uploadRec");
+                inputElement.addEventListener("change", handleFiles, false);
+
+                function handleFiles() {
+                    const f = inputElement.files[0];
+                    const reader = new FileReader();
+                    reader.onload = function () {
+                        try {
+                            const data = new Uint8Array(reader.result);
+                            const files = fflate.unzipSync(data);
+                            const replay = fflate.objFromU8(files.metaData);
+                            replay.inputData = files.inputData;
+                            replay.saveData = files.saveData;
+                            ninjapad.recorder.import(replay);
+                            ninjapad.menu.show.recorderMenu();
+                        }
+                        catch (e) {
+                            showError(`Error<br/><br/>${e.message.strip(".")}`);
+                            DEBUG && console.log(e);
+                        }
+                    }
+                    reader.readAsArrayBuffer(f);
+                }
+            },
+
             export: function() {
-                const data = ninjapad.recorder.export();
-                const name = data.romHash.substring(48);
+                TMP = ninjapad.recorder.debug.getUserInput();
+                const exportData = ninjapad.recorder.export();
+                const saveData = pop(exportData, "saveData");
+                const inputData = pop(exportData, "inputData");
+                const metaData = fflate.strToU8(JSON.stringify(exportData));
+                const filename = exportData.romHash.substring(48);
+                const filedata = fflate.zipSync(
+                    {
+                        "metaData": metaData,
+                        "inputData": inputData,
+                        "saveData": saveData
+                    },
+                    {
+                        level: 0
+                    }
+                );
                 ninjapad.utils.downloadBlob(
-                    JSON.stringify(data),
-                    name, "application/json"
+                    filedata, filename,
+                    "application/zip"
                 );
             },
 

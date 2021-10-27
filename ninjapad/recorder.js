@@ -126,7 +126,8 @@ ninjapad.recorder = function() {
             // - - - - - - - - - - - - - - - - - - - - - -
             const hash = sha256(ninjapad.emulator.getROMData());
             if (hash != romHash) {
-                return error("ROM file/hash mismatch");
+                status = states.STOP;
+                return error("ROM hash mismatch");
             }
             // - - - - - - - - - - - - - - - - - - - - - -
             ninjapad.pause.pauseEmulation();
@@ -244,10 +245,12 @@ ninjapad.recorder = function() {
                 return false;
             }
             userInput = buffer;
-            saveData = new Uint8Array(replay.saveData);
+            saveData = replay.saveData;
             initialState = replay.initialState;
             finalState = replay.finalState;
             endFrame = replay.endFrame;
+            romHash = replay.romHash;
+            status = states.STOP;
             return true;
         },
 
@@ -270,8 +273,8 @@ ninjapad.recorder = function() {
                 data.push(currByte ^ lastByte);
             }
             return {
-                inputData: data,
-                saveData: [...saveData],
+                saveData: saveData,
+                inputData: new Uint8Array(data),
                 initialState: initialState,
                 finalState: finalState,
                 endFrame: endFrame,
@@ -279,8 +282,14 @@ ninjapad.recorder = function() {
             };
         },
 
-        userInput: function() {
-            return userInput;
+        debug: {
+            getUserInput: function() {
+                return userInput;
+            },
+
+            getSaveData: function() {
+                return saveData;
+            }
         }
     }
 }();
