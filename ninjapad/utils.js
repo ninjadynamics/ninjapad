@@ -16,6 +16,17 @@ ninjapad.utils = function() {
         });
     };
 
+    Object.defineProperty(
+        Object.prototype, 'pop', {
+            enumerable: false,
+            value: function(key) {
+                const value = this[key];
+                delete this[key];
+                return value;
+            }
+        }
+    );
+
     fflate.objFromU8 = function(uint8Array) {
         return JSON.parse(fflate.strFromU8(uint8Array));
     }

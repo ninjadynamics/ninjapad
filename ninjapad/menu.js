@@ -366,8 +366,8 @@ ninjapad.menu = function() {
 
             export: function() {
                 const exportData = ninjapad.recorder.export();
-                const saveData = pop(exportData, "saveData");
-                const inputData = pop(exportData, "inputData");
+                const saveData = exportData.pop("saveData");
+                const inputData = exportData.pop("inputData");
                 const metaData = fflate.strToU8(JSON.stringify(exportData));
                 const filename = exportData.romHash.substring(48);
                 const filedata = fflate.zipSync(
