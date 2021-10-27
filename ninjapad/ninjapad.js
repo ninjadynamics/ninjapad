@@ -93,7 +93,11 @@ $(document).ready(async function() {
 
     // Use ESC key to open the menu
     $(window).keyup(function(e) {
-      if (e.code == "Escape") ninjapad.menu.toggle.mainMenu();
+        if (e.code != "Escape") return;
+        // - - - - - - - - - - - - - - - - - - - - - - - -
+        if (ninjapad.menu.inputRecorder.cancel()) return;
+        // - - - - - - - - - - - - - - - - - - - - - - - -
+        ninjapad.menu.toggle.mainMenu();
     });
 
     // Load a ROM and setup the page layout

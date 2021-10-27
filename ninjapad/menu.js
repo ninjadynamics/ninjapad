@@ -1,6 +1,6 @@
 // 2021 Ninja Dynamics
 // Creative Commons Attribution 4.0 International Public License
-var TMP;
+
 ninjapad.menu = function() {
 
     const pop = ninjapad.utils.pop;
@@ -12,6 +12,8 @@ ninjapad.menu = function() {
         "ON-R",
         "ON-S"
     ];
+
+    var countdown = null;
 
     var iRMode = 2;
 
@@ -286,26 +288,35 @@ ninjapad.menu = function() {
 
             start: function() {
                 var secs = 3;
-                memoryHash = undefined;
                 ninjapad.pause.pauseEmulation(secs);
                 preventUserInteraction();
                 function _start() {
                     ninjapad.pause.setScreenContent(--secs);
                     if (secs) return;
-                    clearInterval(startID);
+                    clearInterval(countdown);
+                    countdown = null;
                     ninjapad.recorder.start();
                     ninjapad.jQElement.recStatus.html(`
                         <div style="font-size: 3vmin;">🔴</div>
                         <div>&nbsp;REC</div>
                     `);
                 }
-                var startID = setInterval(_start, 1000);
+                countdown = setInterval(_start, 1000);
             },
 
             stop: function() {
                 ninjapad.menu.inputRecorder.ready();
                 ninjapad.recorder.setCallback("stop", ninjapad.menu.show.recorderMenu);
                 ninjapad.recorder.stop();
+            },
+
+            cancel: function() {
+                if (!countdown) return false;
+                // - - - - - - - - - - - - - - - -
+                ninjapad.menu.show.recorderMenu();
+                clearInterval(countdown);
+                countdown = null;
+                return true;
             },
 
             play: function() {
@@ -352,7 +363,6 @@ ninjapad.menu = function() {
             },
 
             export: function() {
-                TMP = ninjapad.recorder.debug.getUserInput();
                 const exportData = ninjapad.recorder.export();
                 const saveData = pop(exportData, "saveData");
                 const inputData = pop(exportData, "inputData");
