@@ -259,6 +259,8 @@ ninjapad.menu = function() {
             mainMenu: function() {
                 if (state.isOpen) {
                     closeMenuAndResumeEmulation();
+                    clearInterval(countdown);
+                    countdown = null;
                     return;
                 }
                 var color_on = ninjapad.utils.getCSSVar("#menu", "color_on");
