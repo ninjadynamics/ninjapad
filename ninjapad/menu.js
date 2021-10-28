@@ -4,6 +4,7 @@
 ninjapad.menu = function() {
 
     const pop = ninjapad.utils.pop;
+    const inColor = ninjapad.utils.inColor;
 
     const state = { isOpen: false };
 
@@ -17,10 +18,6 @@ ninjapad.menu = function() {
 
     var iRMode = 2;
 
-    function inColor(color, text) {
-        return `<font color='${color}'>${text}</font>`;
-    }
-
     function allowUserInteraction(ontap=null) {
         ninjapad.utils.allowInteraction("pauseScreenContent");
         ninjapad.utils.assignNoPropagation(ontap, "OSD", ontap && "end");
@@ -31,11 +28,11 @@ ninjapad.menu = function() {
         ninjapad.utils.assignNoPropagation(ontap, "OSD", ontap && "end");
     }
 
-    function showError(msg) {
+    function showMessage(msg, backtap) {
         ninjapad.pause.setScreenContent(
             ninjapad.utils.html("div", "error", msg)
         );
-        preventUserInteraction(returnToMainMenu);
+        preventUserInteraction(backtap);
     }
 
     function recMenu() {
@@ -43,34 +40,36 @@ ninjapad.menu = function() {
         const status = ninjapad.recorder.status();
         const hasData = ninjapad.recorder.hasData();
         const isStopped = status == states.STOP;
+        const isRecording = status == states.REC;
         return ninjapad.utils.createMenu(null,
             ninjapad.utils.link(
-                isStopped && !hasData ? "Start" : "Restart",
+                isRecording ? "Restart" : "Record",
                 js="ninjapad.menu.inputRecorder.start();"
             ),
             ninjapad.utils.link(
                 "Play",
                 js="ninjapad.menu.inputRecorder.play();",
-                hide=!hasData
+                hide=!(hasData && isStopped)
             ),
             ninjapad.utils.link(
                 "Stop",
                 js="ninjapad.menu.inputRecorder.stop()",
-                hide=(status == states.STOP)
+                hide=isStopped
             ),
             ninjapad.utils.link(
                 "Clear",
                 js="ninjapad.menu.inputRecorder.clear()",
-                hide=!hasData
+                hide=!(hasData && isStopped)
             ),
             ninjapad.utils.link(
                 "Import",
-                js="ninjapad.menu.inputRecorder.import()"
+                js="ninjapad.menu.inputRecorder.import()",
+                hide=!isStopped
             ),
             ninjapad.utils.link(
                 "Export",
                 js="ninjapad.menu.inputRecorder.export()",
-                hide=!hasData
+                hide=!(hasData && isStopped)
             )
         );
     }
@@ -79,11 +78,11 @@ ninjapad.menu = function() {
         return ninjapad.utils.createMenu(null,
             ninjapad.utils.link(
                 "Import save data",
-                js="ninjapad.menu.error('Not implemented yet')"
+                js="ninjapad.menu.showMessage('Not implemented yet')"
             ),
             ninjapad.utils.link(
                 "Export save data",
-                js="ninjapad.menu.error('Not implemented yet')"
+                js="ninjapad.menu.showMessage('Not implemented yet')"
             ),
             ninjapad.utils.link(
                 `Input recorder ${inColor("lime", iRModes[iRMode])}`,
@@ -139,6 +138,11 @@ ninjapad.menu = function() {
         showMenu(mainMenu, closeMenuAndResumeEmulation);
     }
 
+    function returnToRecorderMenu(event) {
+        event.stopPropagation();
+        showMenu(recMenu, closeMenuAndResumeEmulation);
+    }
+
     function closeMenuAndResumeEmulation(event) {
         if (event) event.stopPropagation();
         if (ninjapad.pause.state.cannotResume) return false;
@@ -156,7 +160,7 @@ ninjapad.menu = function() {
             const hash = sha256(ninjapad.emulator.getROMData());
             const data = localStorage.getItem(hash);
             if (!data) {
-                showError("No save data");
+                showMessage("No save data", returnToMainMenu);
                 return;
             }
             try {
@@ -166,7 +170,7 @@ ninjapad.menu = function() {
                 closeMenuAndResumeEmulation();
             }
             catch (e) {
-                showError(`Error<br/><br/>${e.message}`);
+                showMessage(`Error<br/><br/>${e.message}`, returnToMainMenu);
                 DEBUG && console.log(e);
             }
         },
@@ -180,7 +184,7 @@ ninjapad.menu = function() {
                 closeMenuAndResumeEmulation();
             }
             catch (e) {
-                showError(`Error<br/><br/>${e.message}`);
+                showMessage(`Error<br/><br/>${e.message}`, returnToMainMenu);
                 DEBUG && console.log(e);
             }
         },
@@ -199,11 +203,14 @@ ninjapad.menu = function() {
             inputElement.addEventListener("change", handleFiles, false);
 
             function handleFiles() {
-                let saveData = null;
+                inputElement.removeEventListener("change", handleFiles);
+                const file = ninjapad.utils.getFile(inputElement);
+                if (!file) return false;
+                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                var saveData = null;
                 if (ninjapad.emulator.isROMLoaded()) {
                     saveData = ninjapad.emulator.saveState();
                 }
-                const f = inputElement.files[0];
                 const reader = new FileReader();
                 reader.onload = function () {
                     try {
@@ -217,11 +224,14 @@ ninjapad.menu = function() {
                             ninjapad.emulator.reloadROM();
                             ninjapad.emulator.loadState(saveData);
                         }
-                        showError(`Error<br/><br/>${e.message.strip(".")}`);
+                        showMessage(
+                            `Error<br/><br/>${e.message.strip(".")}`,
+                            returnToMainMenu
+                        );
                         DEBUG && console.log(e);
                     }
                 }
-                reader.readAsBinaryString(f);
+                reader.readAsBinaryString(file);
             }
         },
 
@@ -269,8 +279,8 @@ ninjapad.menu = function() {
             }
         },
 
-        error: function(msg) {
-            showError(msg);
+        showMessage: function(msg, backtap) {
+            showMessage(msg, backtap);
         },
 
         inputRecorder: {
@@ -343,7 +353,10 @@ ninjapad.menu = function() {
                 inputElement.addEventListener("change", handleFiles, false);
 
                 function handleFiles() {
-                    const f = inputElement.files[0];
+                    inputElement.removeEventListener("change", handleFiles);
+                    const file = ninjapad.utils.getFile(inputElement);
+                    if (!file) return false;
+                    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                     const reader = new FileReader();
                     reader.onload = function () {
                         try {
@@ -352,15 +365,31 @@ ninjapad.menu = function() {
                             const replay = fflate.objFromU8(files.metaData);
                             replay.inputData = files.inputData;
                             replay.saveData = files.saveData;
-                            ninjapad.recorder.import(replay);
-                            ninjapad.menu.show.recorderMenu();
+                            if (!ninjapad.recorder.import(replay, true)) {
+                                showMessage(
+                                    ninjapad.recorder.getErrorMessage(true),
+                                    returnToRecorderMenu
+                                );
+                                return false;
+                            }
+                            // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                            showMessage(
+                                `Import<br/>${inColor("lime", "successful")}`,
+                                returnToRecorderMenu
+                            );
+                            return true;
                         }
                         catch (e) {
-                            showError(`Error<br/><br/>${e.message.strip(".")}`);
+                            showMessage(
+                                `Error<br/><br/>${e.message.strip(".")}`,
+                                returnToRecorderMenu
+                            );
                             DEBUG && console.log(e);
+                            return false;
                         }
                     }
-                    reader.readAsArrayBuffer(f);
+                    reader.readAsArrayBuffer(file);
+                    return true;
                 }
             },
 

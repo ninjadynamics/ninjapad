@@ -2,6 +2,7 @@
 // Creative Commons Attribution 4.0 International Public License
 
 ninjapad.recorder = function() {
+
     const fnCallback = {};
 
     const states = {
@@ -22,6 +23,7 @@ ninjapad.recorder = function() {
         "BUTTON_RIGHT"
     ];
 
+    var errorMessage;
     var status = states.STOP;
     var userInput;
     var inputIndex;
@@ -35,17 +37,27 @@ ninjapad.recorder = function() {
     var romHash;
 
     function execute(callback) {
-        console.log(callback);
         if (!callback) return;
-        callback.fn(
-            ...callback.args
-        );
+        callback.fn(...callback.args);
     }
 
-    function error(msg) {
-        DEBUG && console.log(`NinjaPad: ${msg}`);
-        ninjapad.pause.pauseEmulation(msg);
-        return false;
+    function isValidInitialState(replay) {
+        const h = sha256(ninjapad.emulator.getROMData());
+        if (h != replay.romHash) {
+            errorMessage = "ROM file mismatch";
+            DEBUG && console.log("NinjaPad:", errorMessage);
+            return false;
+        }
+        const s = ninjapad.emulator.saveState();
+        ninjapad.emulator.loadState(replay.saveData);
+        const m = ninjapad.emulator.memory();
+        ninjapad.emulator.loadState(s);
+        if (replay.initialState != sha256(m)) {
+            errorMessage = "Invalid memory state";
+            DEBUG && console.log("NinjaPad:", errorMessage);
+            return false;
+        }
+        return true;
     }
 
     return {
@@ -119,31 +131,22 @@ ninjapad.recorder = function() {
             execute(fnCallback.stop);
         },
 
-        play: function() {
+        play: function(verify) {
+            if (verify && !isValidInitialState(replay)) return false;
+            // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             if (!endFrame) {
-                return error("No input data");
+                DEBUG && console.log("NinjaPad: No input data");
+                return false;
             }
-            // - - - - - - - - - - - - - - - - - - - - - -
-            const hash = sha256(ninjapad.emulator.getROMData());
-            if (hash != romHash) {
-                status = states.STOP;
-                return error("ROM hash mismatch");
-            }
-            // - - - - - - - - - - - - - - - - - - - - - -
+            // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             ninjapad.pause.pauseEmulation();
             ninjapad.emulator.releaseAllButtons();
-            const backup = ninjapad.emulator.saveState();
             ninjapad.emulator.loadState(saveData);
-            const snapshot = ninjapad.emulator.memory();
-            if (initialState != sha256(snapshot)) {
-                ninjapad.emulator.loadState(backup);
-                return error("Memory snapshot mismatch");
-            }
-            // - - - - - - - - - - - - - - - - - - - - - -
             ninjapad.emulator.resetFrameCount();
             ninjapad.pause.resumeEmulation();
             inputIndex = 0; lastFrame = 0;
             status = states.PLAY;
+            return true;
         },
 
         read: function(frameIndex) {
@@ -155,7 +158,10 @@ ninjapad.recorder = function() {
                 if (frameIndex == frame) {
                     for (const button of input.buttons) {
                         fnButtonPress[button.pressed](button.id);
-                        console.log("Playback:", button.id, button.pressed ? "pressed" : "released");
+                        DEBUG && console.log(
+                            "NinjaPad:", button.id, button.pressed ?
+                            "pressed" : "released", "(playback)"
+                        );
                     }
                     lastFrame = frame;
                     ++inputIndex;
@@ -164,14 +170,14 @@ ninjapad.recorder = function() {
             if (frameIndex == endFrame) {
                 status = states.STOP;
                 ninjapad.emulator.pause();
-                var memory = ninjapad.emulator.memory();
-                var result = (sha256(memory) == finalState);
+                const memory = ninjapad.emulator.memory();
+                const result = (sha256(memory) == finalState);
                 DEBUG && console.log(
                     "NinjaPad: Playback consistency check:",
                     result ? "PASS" : "FAIL"
                 );
                 ninjapad.pause.pauseEmulation(
-                    "Playback " + (result ? "OK" : "ERROR")
+                    `Playback ${result ? "complete" : "error"}`
                 );
                 execute(fnCallback.play);
             }
@@ -199,7 +205,7 @@ ninjapad.recorder = function() {
                 status = states.REC;
                 userInput.push({
                     offset: frameIndex - lastFrame,
-                    buttons: writeBuffer.sortBy('id')
+                    buttons: writeBuffer.sortBy("id")
                 });
                 lastFrame = frameIndex;
                 writeBuffer = [];
@@ -208,41 +214,32 @@ ninjapad.recorder = function() {
             return true;
         },
 
-        import: function(replay) {
+        import: function(replay, verify=false) {
+            if (verify && !isValidInitialState(replay)) return false;
+            // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             const bin = ninjapad.utils.inBinary;
             const data = replay.inputData;
-            var changes;
-            var buttons;
-            var offset = 0;
+            const buffer = [];
             var currByte = 0x00;
-            var buffer = [];
-            try {
-                for (var i = 0; i < data.length; i += 2) {
-                    offset += data[i];
-                    changes = data[i + 1];
-                    if (!changes) continue;
-                    buttons = [];
-                    var bit = 8;
-                    while (bit--) {
-                        if (bin(changes)[bit] == 0) continue;
-                        buttons.push({
-                            id: buttonArray[7 - bit],
-                            pressed: (bin(currByte)[bit] == 0)
-                        });
-                    }
-                    buffer.push({
-                        offset: offset,
-                        buttons: buttons.sortBy('id')
+            var offset = 0;
+            for (var i = 0; i < data.length; i += 2) {
+                offset += data[i];
+                const changes = data[i + 1];
+                if (!changes) continue;
+                const buttons = [];
+                var bit = 8; while (bit--) {
+                    if (bin(changes)[bit] == 0) continue;
+                    buttons.push({
+                        id: buttonArray[7 - bit],
+                        pressed: (bin(currByte)[bit] == 0)
                     });
-                    currByte ^= changes;
-                    offset = 0;
                 }
-            }
-            catch (e) {
-                ninjapad.pause.pauseEmulation(
-                    `Import error:<br/>${e}`
-                );
-                return false;
+                buffer.push({
+                    offset: offset,
+                    buttons: buttons.sortBy('id')
+                });
+                currByte ^= changes;
+                offset = 0;
             }
             userInput = buffer;
             saveData = replay.saveData;
@@ -255,12 +252,12 @@ ninjapad.recorder = function() {
         },
 
         export: function() {
-            var i, data = [];
+            const data = [];
             var lastByte, currByte = 0;
             for (const frame of userInput) {
                 lastByte = currByte;
                 for (const button of frame.buttons) {
-                    i = buttonArray.indexOf(button.id);
+                    const i = buttonArray.indexOf(button.id);
                     button.pressed ? currByte |= 1 << i : currByte &= ~(1 << i);
                 }
                 var offset = frame.offset;
@@ -280,6 +277,12 @@ ninjapad.recorder = function() {
                 endFrame: endFrame,
                 romHash: romHash
             };
+        },
+
+        getErrorMessage: function(clear=false) {
+            const msg = errorMessage;
+            if (clear) errorMessage = undefined;
+            return msg;
         },
 
         debug: {

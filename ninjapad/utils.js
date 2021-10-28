@@ -229,9 +229,22 @@ ninjapad.utils = function() {
         },
 
         pop: function(obj, key) {
+            if (key == undefined) {
+                key = object.length - 1;
+            }
             const value = obj[key];
             delete obj[key];
             return value;
-        }
+        },
+
+        getFile: function(inputElement) {
+            const file = inputElement.files[0];
+            inputElement.value = "";
+            return file;
+        },
+
+        inColor: function(color, text) {
+            return `<font color='${color}'>${text}</font>`;
+        }        
     }
 }();
