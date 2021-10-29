@@ -409,10 +409,15 @@ ninjapad.menu = function() {
                         level: 0
                     }
                 );
-                ninjapad.utils.downloadBlob(
-                    filedata, filename,
-                    "application/zip"
-                );
+                try {
+                    ninjapad.utils.download(
+                        filedata, filename,
+                        "application/zip"
+                    );
+                }
+                catch (e) {
+                    showMessage(e, null);
+                }
             },
 
             cycleMode: function() {

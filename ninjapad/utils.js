@@ -50,6 +50,12 @@ ninjapad.utils = function() {
             return !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
         },
 
+        isIOSChrome: function() {
+            const isIOS = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
+            const isChrome = !!navigator.userAgent.match('CriOS');
+            return isIOS && isChrome;
+        },
+
         isMobileDevice: function() {
             return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         },
@@ -119,7 +125,6 @@ ninjapad.utils = function() {
             // Assign function call to events
             for (const e of touchEvents) {
                 eval("element.ontouch" + e + " = fn");
-                //if (e == "end") element.onclick = fn;
             }
         },
 
@@ -132,7 +137,6 @@ ninjapad.utils = function() {
             // Assign function call to events
             for (const e of touchEvents) {
                 eval("element.ontouch" + e + " = fn");
-                //if (e == "end") element.onclick = fn;
             }
         },
 
@@ -207,24 +211,52 @@ ninjapad.utils = function() {
             return v.toString(2).padStart(8, "0");
         },
 
-        downloadBlob: function(data, fileName, mimeType) {
-            function downloadURL(data, fileName) {
-                var a;
-                a = document.createElement('a');
+        download: async function(data, filename, mimeType) {
+            const blob = new Blob([data], { type: mimeType });
+
+            // Check if SaveFilePicker is available
+            if (window.showSaveFilePicker) {
+                const fileHandle = await window.showSaveFilePicker({
+                    suggestedName: `${filename}.zip`,
+                    types: [{
+                        description: 'Input Replay',
+                        accept: {
+                            'application/zip': ['.zip'],
+                        },
+                    }],
+                });
+                const fileStream = await fileHandle.createWritable();
+                await fileStream.write(blob);
+                await fileStream.close();
+                return;
+            }
+
+            // Check if it's Chrome on iOS
+            const iOS = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
+            const chrome = !!navigator.userAgent.match('CriOS');
+            if (iOS && chrome) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    window.location.href = reader.result;
+                }
+                reader.readAsDataURL(blob);
+                return;
+            }
+
+            // Do it the traditional way
+            function _download(data, filename) {
+                const a = document.createElement('a');
                 a.href = data;
-                a.download = fileName;
+                a.download = filename;
                 document.body.appendChild(a);
                 a.style = 'display: none';
                 a.click();
                 a.remove();
             }
-            var blob = new Blob(
-                [data], { type: mimeType }
-            );
-            var url = window.URL.createObjectURL(blob);
-            downloadURL(url, fileName);
+            const url = window.URL.createObjectURL(blob);
+            _download(url, filename);
             setTimeout(function() {
-            return window.URL.revokeObjectURL(url);
+                return window.URL.revokeObjectURL(url);
             }, 1000);
         },
 
@@ -245,6 +277,6 @@ ninjapad.utils = function() {
 
         inColor: function(color, text) {
             return `<font color='${color}'>${text}</font>`;
-        }        
+        }
     }
 }();
