@@ -16,7 +16,7 @@ ninjapad.menu = function() {
 
     var countdown = null;
 
-    var iRMode = 2;
+    var iRMode = 0;
 
     function allowUserInteraction(ontap=null) {
         ninjapad.utils.allowInteraction("pauseScreenContent");
@@ -313,6 +313,7 @@ ninjapad.menu = function() {
                         <div>&nbsp;REC</div>
                     `);
                 }
+                if (iRMode == 1) ninjapad.emulator.reloadROM();
                 countdown = setInterval(_start, 1000);
             },
 
