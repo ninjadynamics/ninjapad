@@ -24,6 +24,7 @@ ninjapad.layout = function() {
         ninjapad.jQElement.recStatus.css("bottom", offset);
         ninjapad.menu.inputRecorder.show();
         ninjapad.menu.inputRecorder.ready();
+        ninjapad.menu.inputRecorder.selectMode(0);
     }
 
     function setEmulationScreenLayout() {
@@ -57,7 +58,7 @@ ninjapad.layout = function() {
         $("#REC_MENU").detach().appendTo(ninjapad.jQElement.screen);
         $("#REC_STATUS").detach().appendTo(ninjapad.jQElement.screen);
         var fontSize = `${ninjapad.jQElement.screen.width() * 0.05}px`;
-        ninjapad.jQElement.osd.css("font-size", fontSize);        
+        ninjapad.jQElement.osd.css("font-size", fontSize);
     }
 
     function setMobileLayout() {

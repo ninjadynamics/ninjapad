@@ -5,17 +5,10 @@ ninjapad.menu = function() {
 
     const pop = ninjapad.utils.pop;
     const inColor = ninjapad.utils.inColor;
-
-    const state = { isOpen: false };
-
-    const iRModes = [
-        "OFF",
-        "ON-R",
-        "ON-S"
-    ];
+    const iRModes = ["OFF", "ON-R", "ON-S"];
 
     var countdown = null;
-
+    var isOpen = false;
     var iRMode = 0;
 
     function allowUserInteraction(ontap=null) {
@@ -86,7 +79,7 @@ ninjapad.menu = function() {
             ),
             ninjapad.utils.link(
                 `Input recorder ${inColor("lime", iRModes[iRMode])}`,
-                js=`ninjapad.menu.inputRecorder.cycleMode();
+                js=`ninjapad.menu.inputRecorder.selectMode();
                     ninjapad.menu.show.optionsMenu()`
             )
         );
@@ -130,7 +123,7 @@ ninjapad.menu = function() {
     function openMenu(menu, backtap=null) {
         ninjapad.pause.pauseEmulation(menu());
         allowUserInteraction(backtap);
-        state.isOpen = true;
+        isOpen = true;
     }
 
     function returnToMainMenu(event) {
@@ -149,13 +142,11 @@ ninjapad.menu = function() {
         var color_off = ninjapad.utils.getCSSVar("#menu", "color");
         ninjapad.utils.changeButtonColor("#menu", color_off);
         ninjapad.pause.state.isEmulationPaused && ninjapad.pause.resumeEmulation();
-        state.isOpen = false;
+        isOpen = false;
         return true;
     }
 
     return {
-        state: state,
-
         loadState: function() {
             const hash = sha256(ninjapad.emulator.getROMData());
             const data = localStorage.getItem(hash);
@@ -267,7 +258,7 @@ ninjapad.menu = function() {
 
         toggle: {
             mainMenu: function() {
-                if (state.isOpen) {
+                if (isOpen) {
                     closeMenuAndResumeEmulation();
                     clearInterval(countdown);
                     countdown = null;
@@ -421,8 +412,12 @@ ninjapad.menu = function() {
                 }
             },
 
-            cycleMode: function() {
-                iRMode = ninjapad.utils.nextIndex(iRModes, iRMode);
+            selectMode: function(mode) {
+                iRMode = (
+                    mode == undefined ?
+                    ninjapad.utils.nextIndex(iRModes, iRMode) :
+                    mode
+                );
                 if (iRMode) {
                     ninjapad.jQElement.recMenu.show();
                     ninjapad.jQElement.recStatus.show();
