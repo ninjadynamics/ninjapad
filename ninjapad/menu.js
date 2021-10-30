@@ -11,22 +11,8 @@ ninjapad.menu = function() {
     var isOpen = false;
     var iRMode = 0;
 
-    function allowUserInteraction(ontap=null) {
-        ninjapad.utils.allowInteraction("pauseScreenContent");
-        ninjapad.utils.assignNoPropagation(ontap, "OSD", ontap && "end");
-    }
-
-    function preventUserInteraction(ontap=null) {
-        ninjapad.utils.assign(null, "pauseScreenContent");
-        ninjapad.utils.assignNoPropagation(ontap, "OSD", ontap && "end");
-    }
-
-    function showMessage(msg, backtap) {
-        ninjapad.pause.setScreenContent(
-            ninjapad.utils.html("div", "error", msg)
-        );
-        preventUserInteraction(backtap);
-    }
+    var fnESC = null;
+    var fnESCArgs = [];
 
     function recMenu() {
         const states = ninjapad.recorder.states();
@@ -80,7 +66,7 @@ ninjapad.menu = function() {
             ninjapad.utils.link(
                 `Input recorder ${inColor("lime", iRModes[iRMode])}`,
                 js=`ninjapad.menu.inputRecorder.selectMode();
-                    ninjapad.menu.show.optionsMenu()`
+                ninjapad.menu.show.optionsMenu()`
             )
         );
     }
@@ -115,24 +101,44 @@ ninjapad.menu = function() {
         );
     }
 
+    function allowUserInteraction(ontap=null) {
+        ninjapad.utils.allowInteraction("pauseScreenContent");
+        ninjapad.utils.assignNoPropagation(ontap, "OSD", ontap && "end");
+    }
+
+    function preventUserInteraction(ontap=null) {
+        ninjapad.utils.assign(null, "pauseScreenContent");
+        ninjapad.utils.assignNoPropagation(ontap, "OSD", ontap && "end");
+    }
+
+    function showMessage(msg, backtap) {
+        ninjapad.pause.setScreenContent(
+            ninjapad.utils.html("div", "error", msg)
+        );
+        preventUserInteraction(backtap);
+        fnESC = backtap;
+    }
+
     function showMenu(fnMenu, backtap=null) {
         ninjapad.pause.setScreenContent(fnMenu());
         allowUserInteraction(backtap);
+        fnESC = backtap;
     }
 
     function openMenu(menu, backtap=null) {
         ninjapad.pause.pauseEmulation(menu());
         allowUserInteraction(backtap);
+        fnESC = backtap;
         isOpen = true;
     }
 
     function returnToMainMenu(event) {
-        event.stopPropagation();
+        if (event) event.stopPropagation();
         showMenu(mainMenu, closeMenuAndResumeEmulation);
     }
 
     function returnToRecorderMenu(event) {
-        event.stopPropagation();
+        if (event) event.stopPropagation();
         showMenu(recMenu, closeMenuAndResumeEmulation);
     }
 
@@ -147,8 +153,22 @@ ninjapad.menu = function() {
     }
 
     return {
+        pressESC: function() {
+            if (fnESC) {
+                fnESC(...fnESCArgs);
+                fnESC = null; fnESCArgs = [];
+                return;
+            }
+            ninjapad.menu.toggle.mainMenu();
+        },
+
         loadState: function() {
-            const hash = sha256(ninjapad.emulator.getROMData());
+            const romData = ninjapad.emulator.getROMData();
+            if (!romData) {
+                showMessage("No ROM loaded", returnToMainMenu);
+                return;
+            }
+            const hash = sha256(romData);
             const data = localStorage.getItem(hash);
             if (!data) {
                 showMessage("No save data", returnToMainMenu);
@@ -167,7 +187,12 @@ ninjapad.menu = function() {
         },
 
         saveState: function() {
-            const hash = sha256(ninjapad.emulator.getROMData());
+            const romData = ninjapad.emulator.getROMData();
+            if (!romData) {
+                showMessage("No ROM loaded", returnToMainMenu);
+                return;
+            }
+            const hash = sha256(romData);
             const data = ninjapad.emulator.saveState();
             try {
                 const optimizedData = uint8ToUtf16.encode(data);
@@ -240,7 +265,9 @@ ninjapad.menu = function() {
             ninjapad.pause.setScreenContent(
                 ninjapad.utils.html("div", "about", ABOUT)
             )
-            allowUserInteraction(returnToMainMenu)
+            ninjapad.utils.assignClick(null, "OSD");
+            allowUserInteraction(returnToMainMenu);
+            fnESC = returnToMainMenu;
         },
 
         open: {
@@ -249,6 +276,7 @@ ninjapad.menu = function() {
                 var color_on = ninjapad.utils.getCSSVar("#menu", "color_on");
                 ninjapad.utils.changeButtonColor("#menu", color_on, glow=true);
                 openMenu(recMenu, closeMenuAndResumeEmulation);
+                ninjapad.utils.assignClick(null, "OSD");
             }
         },
 
@@ -267,6 +295,7 @@ ninjapad.menu = function() {
                 var color_on = ninjapad.utils.getCSSVar("#menu", "color_on");
                 ninjapad.utils.changeButtonColor("#menu", color_on, glow=true);
                 openMenu(mainMenu, closeMenuAndResumeEmulation);
+                ninjapad.utils.assignClick(null, "OSD");
             }
         },
 

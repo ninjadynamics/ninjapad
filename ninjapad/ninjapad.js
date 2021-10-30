@@ -80,11 +80,13 @@ $(document).ready(async function() {
     ninjapad.emulator = ninjapad.interface[EMULATOR];
 
     // Pause on loss of focus
-    $(window).blur(function() {
-        !ninjapad.pause.state.isEmulationPaused &&
-        ninjapad.utils.isMobileDevice() &&
-        ninjapad.pause.pauseEmulation();
-    });
+    $(window).blur(
+        function() {
+            const isPaused = ninjapad.pause.state.isEmulationPaused;
+            if (!isPaused) ninjapad.pause.pauseEmulation();
+            console.log("Autosave");
+        }
+    );
 
     // Reload layout on orientation change
     $(window).resize(function() {
@@ -94,10 +96,7 @@ $(document).ready(async function() {
     // Use ESC key to open the menu
     $(window).keyup(function(e) {
         if (e.code != "Escape") return;
-        // - - - - - - - - - - - - - - - - - - - - - - - -
-        if (ninjapad.menu.inputRecorder.cancel()) return;
-        // - - - - - - - - - - - - - - - - - - - - - - - -
-        ninjapad.menu.toggle.mainMenu();
+        ninjapad.menu.pressESC();
     });
 
     // Load a ROM and setup the page layout

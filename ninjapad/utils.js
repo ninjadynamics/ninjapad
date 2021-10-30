@@ -140,6 +140,12 @@ ninjapad.utils = function() {
             }
         },
 
+        assignClick: function(fn, elementName) {
+            // Prevent default on all events
+            let element = document.getElementById(elementName);
+            element.onclick = fn;
+        },
+
         allowInteraction: function(elementName) {
             let element = document.getElementById(elementName);
             for (const e of TOUCH_EVENTS) {
