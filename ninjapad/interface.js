@@ -79,13 +79,13 @@ ninjapad.interface = {
         };
 
         const nes = new jsnes.NES({
-            onFrame: function(framebuffer_24){
-                for(var i = 0; i < FRAMEBUFFER_SIZE; i++) framebuffer_u32[i] = 0xFF000000 | framebuffer_24[i];
+            onFrame: function(framebuffer_24) {
+                for (var i = 0; i < FRAMEBUFFER_SIZE; i++) framebuffer_u32[i] = 0xFF000000 | framebuffer_24[i];
                 ninjapad.recorder.read(frameCounter) || ninjapad.recorder.write(frameCounter);
                 //console.log(frameCounter, sha256(nes.cpu.mem));
                 ++frameCounter;
             },
-            onAudioSample: function(l, r){
+            onAudioSample: function(l, r) {
                 audio_samples_L[audio_write_cursor] = l;
                 audio_samples_R[audio_write_cursor] = r;
                 audio_write_cursor = (audio_write_cursor + 1) & SAMPLE_MASK;
@@ -104,14 +104,14 @@ ninjapad.interface = {
             return sampleRate;
         }
 
-        function onAnimationFrame(){
+        function onAnimationFrame() {
             window.setTimeout(onAnimationFrame, 1000/60);
             image.data.set(framebuffer_u8);
             canvas_ctx.putImageData(image, 0, 0);
             if (!ninjapad.pause.state.isEmulationPaused) for (var iii = 0; iii < SPEED; ++iii) nes.frame();
         }
 
-        function audio_remain(){
+        function audio_remain() {
             return (audio_write_cursor - audio_read_cursor) & SAMPLE_MASK;
         }
 
@@ -126,7 +126,7 @@ ninjapad.interface = {
 
             var dst_l = dst.getChannelData(0);
             var dst_r = dst.getChannelData(1);
-            for(var i = 0; i < len; i++){
+            for (var i = 0; i < len; i++) {
                 var src_idx = (audio_read_cursor + i) & SAMPLE_MASK;
                 dst_l[i] = audio_samples_L[src_idx];
                 dst_r[i] = audio_samples_R[src_idx];
@@ -146,7 +146,7 @@ ninjapad.interface = {
             event.preventDefault();
         }
 
-        function nes_init(canvas_id){
+        function nes_init(canvas_id) {
             var canvas = document.getElementById(canvas_id);
             canvas_ctx = canvas.getContext("2d");
             image = canvas_ctx.getImageData(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -168,34 +168,32 @@ ninjapad.interface = {
             document.addEventListener('keydown',          () => { audio_ctx.resume() });
         }
 
-        function nes_boot(rom_data){
+        function nes_boot(rom_data) {
             nes.loadROM(rom_data);
             window.requestAnimationFrame(onAnimationFrame);
         }
 
-        function nes_load_data(canvas_id, rom_data){
+        function nes_load_data(canvas_id, rom_data) {
             nes_init(canvas_id);
             nes_boot(rom_data);
         }
 
-        function nes_load_url(canvas_id, path){
+        function nes_load_url(canvas_id, path, callback, ...args) {
             nes_init(canvas_id);
-
             var req = new XMLHttpRequest();
             req.open("GET", path);
             req.overrideMimeType("text/plain; charset=x-user-defined");
             req.onerror = () => console.log(`Error loading ${path}: ${req.statusText}`);
-
             req.onload = function() {
                 if (this.status === 200) {
                 nes_boot(this.responseText);
+                if (callback) callback(...args);
                 } else if (this.status === 0) {
                     // Aborted, so ignore error
                 } else {
                     req.onerror();
                 }
             };
-
             req.send();
         }
 
@@ -360,7 +358,7 @@ ninjapad.interface = {
                         audio_ctx.suspend();
                     }
                     audio_ctx = {
-                        resume: function(){},
+                        resume: function() {},
                         isNull: true
                     };
                     if (typeof enforcePause === 'undefined') {
@@ -424,8 +422,8 @@ ninjapad.interface = {
                 return nes.cpu.mem;
             },
 
-            initialize: function() {
-                nes_load_url(DISPLAY, DEFAULT_ROM);
+            initialize: function(callback, ...args) {
+                nes_load_url(DISPLAY, DEFAULT_ROM, callback, ...args);
             }
         };
     }()

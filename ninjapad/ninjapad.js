@@ -69,6 +69,30 @@ const ninjapad = {
         ninjapad.utils.assign(null, "GAMEPAD"); // Do not remove this line !!!
 
         DEBUG && console.log("NinjaPad: Ready");
+    },
+
+    autosave: function() {
+        const isROMLoaded = ninjapad.emulator.isROMLoaded();
+        if (isROMLoaded) {
+            const output = ninjapad.menu.saveState("auto", resume=false);
+            DEBUG && console.log(
+                "NinjaPad:", output.result == true ?
+                `Autosaved ${output.id.substring(48)}` :
+                `Autosave failed for ${output.id.substring(48)}`
+            );
+        }
+    },
+
+    autoload: function() {
+        const isROMLoaded = ninjapad.emulator.isROMLoaded();
+        if (isROMLoaded) {
+            const output = ninjapad.menu.loadState("auto", resume=false);
+            DEBUG && console.log(
+                "NinjaPad:", output.result == true ?
+                `Autoloaded ${output.id.substring(48)}` :
+                `Autoload failed for ${output.id.substring(48)}`
+            );
+        }
     }
 };
 
@@ -84,7 +108,7 @@ $(document).ready(async function() {
         function() {
             const isPaused = ninjapad.pause.state.isEmulationPaused;
             if (!isPaused) ninjapad.pause.pauseEmulation();
-            console.log("Autosave");
+            ninjapad.autosave();
         }
     );
 
@@ -100,6 +124,6 @@ $(document).ready(async function() {
     });
 
     // Load a ROM and setup the page layout
-    ninjapad.emulator.initialize();
+    ninjapad.emulator.initialize(ninjapad.autoload);
     ninjapad.initialize();
 });

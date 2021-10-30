@@ -9,12 +9,15 @@ ninjapad.pause = function() {
         content: ""
     };
 
-    function pauseText(content) {
+    function pauseText(content, resumable) {
         if (!content) {
             let msg = "Emulation paused";
             let resumeMsg = ninjapad.utils.isMobileDevice() ? "Tap" : "Click";
             resumeMsg += " to resume";
             content = "<span>" + msg + "<br/>" + resumeMsg + "</span>";
+            resumable = true;
+        }
+        if (resumable) {
             ninjapad.utils.assignNoPropagation(ninjapad.pause.resumeEmulation, "OSD", "end");
             ninjapad.utils.assignClick(ninjapad.pause.resumeEmulation, "OSD");
         }
@@ -31,10 +34,10 @@ ninjapad.pause = function() {
             $("#pauseScreenContent").html(pauseScreen.content);
         },
 
-        pauseEmulation: function(content=null) {
+        pauseEmulation: function(content=null, resumable=false) {
             ninjapad.emulator.pause();
             pauseScreen.visibility = "visible";
-            pauseScreen.content = pauseText(content);
+            pauseScreen.content = pauseText(content, resumable);
             ninjapad.jQElement.osd.empty();
             ninjapad.jQElement.osd.append(pauseScreen.content);
             ninjapad.jQElement.osd.css("visibility", pauseScreen.visibility);

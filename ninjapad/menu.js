@@ -112,6 +112,10 @@ ninjapad.menu = function() {
     }
 
     function showMessage(msg, backtap) {
+        if (!ninjapad.pause.state.isEmulationPaused) {
+            DEBUG && console.log("NinjaPad:", msg);
+            return;
+        }
         ninjapad.pause.setScreenContent(
             ninjapad.utils.html("div", "error", msg)
         );
@@ -163,46 +167,50 @@ ninjapad.menu = function() {
             ninjapad.menu.toggle.mainMenu();
         },
 
-        loadState: function() {
+        loadState: function(id="", resume=true) {
             const romData = ninjapad.emulator.getROMData();
             if (!romData) {
                 showMessage("No ROM loaded", returnToMainMenu);
                 return;
             }
             const hash = sha256(romData);
-            const data = localStorage.getItem(hash);
+            const data = localStorage.getItem(id + hash);
             if (!data) {
                 showMessage("No save data", returnToMainMenu);
-                return;
+                return {id: hash, result: false};
             }
             try {
                 ninjapad.emulator.loadState(
                     uint8ToUtf16.decode(data)
                 );
-                closeMenuAndResumeEmulation();
+                if (resume) closeMenuAndResumeEmulation();
+                return {id: hash, result: true};
             }
             catch (e) {
                 showMessage(`Error<br/><br/>${e.message}`, returnToMainMenu);
                 DEBUG && console.log(e);
+                return {id: hash, result: false};
             }
         },
 
-        saveState: function() {
+        saveState: function(id="", resume=true) {
             const romData = ninjapad.emulator.getROMData();
             if (!romData) {
                 showMessage("No ROM loaded", returnToMainMenu);
-                return;
+                return {id: null, result: false};
             }
             const hash = sha256(romData);
             const data = ninjapad.emulator.saveState();
             try {
                 const optimizedData = uint8ToUtf16.encode(data);
-                localStorage.setItem(hash, optimizedData);
-                closeMenuAndResumeEmulation();
+                localStorage.setItem(id + hash, optimizedData);
+                if (resume) closeMenuAndResumeEmulation();
+                return {id: hash, result: true};
             }
             catch (e) {
                 showMessage(`Error<br/><br/>${e.message}`, returnToMainMenu);
                 DEBUG && console.log(e);
+                return {id: hash, result: false};
             }
         },
 
@@ -224,16 +232,15 @@ ninjapad.menu = function() {
                 const file = ninjapad.utils.getFile(inputElement);
                 if (!file) return false;
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                var saveData = null;
-                if (ninjapad.emulator.isROMLoaded()) {
-                    saveData = ninjapad.emulator.saveState();
-                }
+                const isROMLoaded = ninjapad.emulator.isROMLoaded()
+                var saveData = isROMLoaded ? ninjapad.emulator.saveState() : null;
                 const reader = new FileReader();
                 reader.onload = function () {
                     try {
                         ninjapad.emulator.loadROMData(reader.result);
                         ninjapad.menu.inputRecorder.ready();
                         ninjapad.recorder.clear();
+                        ninjapad.autoload();
                         closeMenuAndResumeEmulation();
                     }
                     catch (e) {
@@ -393,7 +400,7 @@ ninjapad.menu = function() {
                             }
                             // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                             showMessage(
-                                `Import<br/>${inColor("lime", "successful")}`,
+                                "Import successful",
                                 returnToRecorderMenu
                             );
                             return true;

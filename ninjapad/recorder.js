@@ -139,7 +139,7 @@ ninjapad.recorder = function() {
                 return false;
             }
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-            ninjapad.pause.pauseEmulation();
+            ninjapad.emulator.pause();
             ninjapad.emulator.releaseAllButtons();
             ninjapad.emulator.loadState(saveData);
             ninjapad.emulator.resetFrameCount();
@@ -177,7 +177,8 @@ ninjapad.recorder = function() {
                     result ? "PASS" : "FAIL"
                 );
                 ninjapad.pause.pauseEmulation(
-                    `Playback ${result ? "complete" : "error"}`
+                    `Playback ${result ? "complete" : "error"}`,
+                    resumable=true
                 );
                 execute(fnCallback.play);
             }
