@@ -56,12 +56,11 @@ ninjapad.menu = function() {
     function optionsMenu() {
         return ninjapad.utils.createMenu(null,
             ninjapad.utils.link(
-                "Import save data",
+                "Manage save data",
                 js="ninjapad.menu.showMessage('Not implemented yet')"
-            ),
-            ninjapad.utils.link(
-                "Export save data",
-                js="ninjapad.menu.showMessage('Not implemented yet')"
+                // Import (this / all)
+                // Export (this / all)
+                // Clear  (this / all)
             ),
             ninjapad.utils.link(
                 `Input recorder ${inColor("lime", iRModes[iRMode])}`,
