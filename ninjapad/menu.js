@@ -148,6 +148,7 @@ ninjapad.menu = function() {
         var color_off = ninjapad.utils.getCSSVar("#menu", "color");
         ninjapad.utils.changeButtonColor("#menu", color_off);
         ninjapad.pause.state.isEmulationPaused && ninjapad.pause.resumeEmulation();
+        fnESC = null; fnESCArgs = [];
         isOpen = false;
         return true;
     }
@@ -265,7 +266,6 @@ ninjapad.menu = function() {
             ninjapad.pause.setScreenContent(
                 ninjapad.utils.html("div", "about", ABOUT)
             )
-            ninjapad.utils.assignClick(null, "OSD");
             allowUserInteraction(returnToMainMenu);
             fnESC = returnToMainMenu;
         },
@@ -276,7 +276,6 @@ ninjapad.menu = function() {
                 var color_on = ninjapad.utils.getCSSVar("#menu", "color_on");
                 ninjapad.utils.changeButtonColor("#menu", color_on, glow=true);
                 openMenu(recMenu, closeMenuAndResumeEmulation);
-                ninjapad.utils.assignClick(null, "OSD");
             }
         },
 
@@ -295,7 +294,6 @@ ninjapad.menu = function() {
                 var color_on = ninjapad.utils.getCSSVar("#menu", "color_on");
                 ninjapad.utils.changeButtonColor("#menu", color_on, glow=true);
                 openMenu(mainMenu, closeMenuAndResumeEmulation);
-                ninjapad.utils.assignClick(null, "OSD");
             }
         },
 

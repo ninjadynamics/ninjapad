@@ -15,6 +15,8 @@ ninjapad.pause = function() {
             let resumeMsg = ninjapad.utils.isMobileDevice() ? "Tap" : "Click";
             resumeMsg += " to resume";
             content = "<span>" + msg + "<br/>" + resumeMsg + "</span>";
+            ninjapad.utils.assignNoPropagation(ninjapad.pause.resumeEmulation, "OSD", "end");
+            ninjapad.utils.assignClick(ninjapad.pause.resumeEmulation, "OSD");
         }
         return ninjapad.utils.html("div", "pauseScreenContent", content);
     }
@@ -39,8 +41,6 @@ ninjapad.pause = function() {
             ninjapad.jQElement.osd.css("transform", "translateZ(0)");
             state.isEmulationPaused = true;
             ninjapad.utils.assign(null, "pauseScreenContent");
-            ninjapad.utils.assignNoPropagation(ninjapad.pause.resumeEmulation, "OSD", "end");
-            ninjapad.utils.assignClick(ninjapad.pause.resumeEmulation, "OSD");
             DEBUG && console.log("NinjaPad: Emulation paused");
         },
 
@@ -53,6 +53,7 @@ ninjapad.pause = function() {
             state.isEmulationPaused = false;
             ninjapad.menu.close();
             ninjapad.utils.assignClick(null, "OSD");
+            ninjapad.utils.assignNoPropagation(null, "OSD", "end");
             DEBUG && console.log("NinjaPad: Emulation resumed");
         }
     };
