@@ -5,7 +5,7 @@ ninjapad.menu = function() {
 
     const pop = ninjapad.utils.pop;
     const inColor = ninjapad.utils.inColor;
-    const iRModes = ["OFF", "ON-R", "ON-S"];
+    const iRModes = ["OFF", "ON-S", "ON-R"];
 
     var countdown = null;
     var isOpen = false;
@@ -337,7 +337,7 @@ ninjapad.menu = function() {
                         <div>&nbsp;REC</div>
                     `);
                 }
-                if (iRMode == 1) ninjapad.emulator.reloadROM();
+                if (iRMode == 2) ninjapad.emulator.reloadROM();
                 countdown = setInterval(_start, 1000);
             },
 
