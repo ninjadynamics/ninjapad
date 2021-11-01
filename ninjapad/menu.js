@@ -449,7 +449,7 @@ ninjapad.menu = function() {
                 iRMode = (
                     mode == undefined ?
                     ninjapad.utils.nextIndex(iRModes, iRMode) :
-                    mode
+                    mode < 0 ? iRMode : mode
                 );
                 if (iRMode) {
                     ninjapad.jQElement.recMenu.show();

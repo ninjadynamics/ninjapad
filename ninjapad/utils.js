@@ -78,7 +78,7 @@ ninjapad.utils = function() {
             } else if (element.msRequestFullscreen) {
                  element.msRequestFullscreen();
             } else if (element.webkitEnterFullscreen) {
-                element.webkitEnterFullscreen(); //for iphone this code worked
+                element.webkitEnterFullscreen();
             }
         },
 

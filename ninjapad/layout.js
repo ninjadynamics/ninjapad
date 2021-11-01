@@ -24,7 +24,7 @@ ninjapad.layout = function() {
         ninjapad.jQElement.recStatus.css("bottom", offset);
         ninjapad.menu.inputRecorder.show();
         ninjapad.menu.inputRecorder.ready();
-        ninjapad.menu.inputRecorder.selectMode(0);
+        ninjapad.menu.inputRecorder.selectMode(-1);
     }
 
     function setEmulationScreenLayout() {
