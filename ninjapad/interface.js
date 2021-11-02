@@ -311,11 +311,13 @@ ninjapad.interface = {
         function buttonDown(b) {
             if (ninjapad.recorder.buffer(b, true)) return;
             nes.buttonDown(1, eval("jsnes.Controller." + b));
+            ninjapad.layout.showButtonPress(b, true);
         }
 
         function buttonUp(b) {
             if (ninjapad.recorder.buffer(b, false)) return;
             nes.buttonUp(1, eval("jsnes.Controller." + b));
+            ninjapad.layout.showButtonPress(b, false);
         }
 
         // If you wish to create your own interface,

@@ -158,10 +158,6 @@ ninjapad.recorder = function() {
                 if (frameIndex == frame) {
                     for (const button of input.buttons) {
                         fnButtonPress[button.pressed](button.id);
-                        DEBUG && console.log(
-                            "NinjaPad:", button.id, button.pressed ?
-                            "pressed" : "released", "(playback)"
-                        );
                     }
                     lastFrame = frame;
                     ++inputIndex;

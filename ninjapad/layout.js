@@ -134,6 +134,12 @@ ninjapad.layout = function() {
         setPageLayout: function() {
             ninjapad.utils.isMobileDevice() ? setMobileLayout() : setDesktopLayout();
             setOSDLayout();
+        },
+
+        showButtonPress: function(id, pressed) {
+            var element = document.getElementById(id);
+            $(element).css("border-style", pressed ? "inset" : "outset");
+            DEBUG && console.log("NinjaPad:", pressed ? "Pressed" : "Released", element.id);
         }
     };
 }();
