@@ -108,7 +108,7 @@ ninjapad.interface = {
             window.setTimeout(onAnimationFrame, 1000/60);
             image.data.set(framebuffer_u8);
             canvas_ctx.putImageData(image, 0, 0);
-            if (!ninjapad.pause.state.isEmulationPaused) for (var iii = 0; iii < SPEED; ++iii) nes.frame();
+            if (!ninjapad.pause.state.isEmulationPaused) nes.frame();
         }
 
         function audio_remain() {
@@ -122,7 +122,7 @@ ninjapad.interface = {
             var len = dst.length;
 
             // Attempt to avoid buffer underruns
-            if(audio_remain() < AUDIO_BUFFERING && !ninjapad.pause.state.isEmulationPaused) for (var iii = 0; iii < SPEED; ++iii) nes.frame();
+            if(audio_remain() < AUDIO_BUFFERING && !ninjapad.pause.state.isEmulationPaused) nes.frame();
 
             var dst_l = dst.getChannelData(0);
             var dst_r = dst.getChannelData(1);

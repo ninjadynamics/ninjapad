@@ -12,4 +12,3 @@ Follow me on Twitter:<br/>
 <font color="yellow">ninjadynamics</font>
 </a>
 `
-var SPEED = 1;
