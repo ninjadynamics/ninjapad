@@ -42,8 +42,8 @@ ninjapad.pause = function() {
             ninjapad.jQElement.osd.append(pauseScreen.content);
             ninjapad.jQElement.osd.css("visibility", pauseScreen.visibility);
             ninjapad.jQElement.osd.css("transform", "translateZ(0)");
-            state.isEmulationPaused = true;
             ninjapad.utils.assign(null, "pauseScreenContent");
+            state.isEmulationPaused = true;
             DEBUG && console.log("NinjaPad: Emulation paused");
         },
 

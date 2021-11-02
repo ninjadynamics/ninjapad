@@ -114,6 +114,7 @@ $(document).ready(async function() {
 
     // Reload layout on orientation change
     $(window).resize(function() {
+        ninjapad.autosave();
         ninjapad.initialize();
     });
 
