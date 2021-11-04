@@ -283,6 +283,16 @@ ninjapad.utils = function() {
 
         inColor: function(color, text) {
             return `<font color='${color}'>${text}</font>`;
+        },
+
+        minify: function(s) {
+            var inside = 0;
+            return s.replace(
+                / +|"/g, m => m === '"' ?
+                (inside ^= 1, '"') :
+                (inside ? m : '')
+            ).replace(/(?:\r\n|\r|\n)/g, '');
         }
+
     }
 }();

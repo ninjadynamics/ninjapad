@@ -57,15 +57,16 @@ ninjapad.menu = function() {
         return ninjapad.utils.createMenu(null,
             ninjapad.utils.link(
                 "Manage save data",
-                js="ninjapad.menu.showMessage('Not implemented yet')"
+                js="ninjapad.menu.manageSaveData()",
+                hide=!SAVE_STATES
                 // Import (this / all)
                 // Export (this / all)
                 // Clear  (this / all)
             ),
             ninjapad.utils.link(
                 `Input recorder ${inColor("lime", iRModes[iRMode])}`,
-                js=`ninjapad.menu.inputRecorder.selectMode();
-                ninjapad.menu.show.optionsMenu()`
+                js=`ninjapad.menu.inputRecorder.selectMode(); ninjapad.menu.show.optionsMenu()`,
+                hide=!INPUT_RECORDER
             )
         );
     }
@@ -79,15 +80,18 @@ ninjapad.menu = function() {
             ),
             ninjapad.utils.link(
                 "Save State",
-                js="ninjapad.menu.saveState()"
+                js="ninjapad.menu.saveState()",
+                hide=!SAVE_STATES
             ),
             ninjapad.utils.link(
                 "Load State",
-                js="ninjapad.menu.loadState()"
+                js="ninjapad.menu.loadState()",
+                hide=!SAVE_STATES
             ),
             ninjapad.utils.link(
                 "Options",
-                js="ninjapad.menu.show.optionsMenu()"
+                js="ninjapad.menu.show.optionsMenu()",
+                hide=(!SAVE_STATES && !INPUT_RECORDER)
             ),
             ninjapad.utils.link(
                 "Reset",
@@ -143,6 +147,11 @@ ninjapad.menu = function() {
     function returnToRecorderMenu(event) {
         if (event) event.stopPropagation();
         showMenu(recMenu, closeMenuAndResumeEmulation);
+    }
+
+    function returnToOptionsMenu(event) {
+        if (event) event.stopPropagation();
+        showMenu(optionsMenu, returnToMainMenu);
     }
 
     function closeMenuAndResumeEmulation(event) {
@@ -211,6 +220,10 @@ ninjapad.menu = function() {
                 DEBUG && console.log(e);
                 return {id: hash, result: false};
             }
+        },
+
+        manageSaveData: function() {
+            showMessage("Not implemented yet", returnToOptionsMenu);
         },
 
         reset: function() {
