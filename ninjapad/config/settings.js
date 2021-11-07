@@ -5,8 +5,8 @@ const DEBUG = true;
 const DEADZONE = 2; //vw
 
 // Emulation screen
-const DISPLAY = "emu-canvas";
 const SCREEN = "emu-screen";
+const DISPLAY = "emu-canvas";
 
 // Emulation settings
 const EMULATOR = "jsnes";

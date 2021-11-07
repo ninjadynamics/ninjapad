@@ -56,12 +56,14 @@ ninjapad.menu = function() {
     function optionsMenu() {
         return ninjapad.utils.createMenu(null,
             ninjapad.utils.link(
-                "Manage save data",
-                js="ninjapad.menu.manageSaveData()",
+                "Export save data",
+                js="ninjapad.menu.exportSaveData()",
                 hide=!SAVE_STATES
-                // Import (this / all)
-                // Export (this / all)
-                // Clear  (this / all)
+            ),
+            ninjapad.utils.link(
+                "Import save data",
+                js="ninjapad.menu.importSaveData()",
+                hide=!SAVE_STATES
             ),
             ninjapad.utils.link(
                 `Input recorder ${inColor("lime", iRModes[iRMode])}`,
@@ -222,8 +224,32 @@ ninjapad.menu = function() {
             }
         },
 
-        manageSaveData: function() {
-            showMessage("Not implemented yet", returnToOptionsMenu);
+        exportSaveData: function() {
+            const archive = {};
+            for (const key in localStorage) {
+                if (typeof localStorage[key] !== 'string') continue;
+                archive[key] = uint8ToUtf16.decode(
+                    localStorage.getItem(key)
+                )
+                console.log(key)
+            }
+            const saveData = fflate.zipSync(archive, {level: 0});
+            try {
+                ninjapad.utils.download(
+                    saveData, "savedata",
+                    "application/zip"
+                );
+            }
+            catch (e) {
+                showMessage(e, null);
+            }
+        },
+
+        importSaveData: function() {
+            showMessage(
+                "Not implemented yet",
+                returnToOptionsMenu
+            );
         },
 
         reset: function() {
