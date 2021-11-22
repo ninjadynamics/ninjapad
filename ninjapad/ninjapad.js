@@ -40,7 +40,7 @@ const ninjapad = {
             analogSwitch:   $("#analogSwitch"),
             menu:           $("#menu"),
             uploadROM:      $("#uploadROM"),
-            uploadRec:      $("#uploadRec"),
+            uploadZIP:      $("#uploadZIP"),
             analogStick:    $("#ANALOG_STICK"),
             analog:         $("#ANALOG"),
             dpad:           $("#DPAD"),

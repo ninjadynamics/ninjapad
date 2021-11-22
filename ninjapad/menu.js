@@ -225,18 +225,19 @@ ninjapad.menu = function() {
         },
 
         exportSaveData: function() {
-            const archive = {};
+            const saveData = {};
             for (const key in localStorage) {
                 if (typeof localStorage[key] !== 'string') continue;
-                archive[key] = uint8ToUtf16.decode(
+                saveData[key] = uint8ToUtf16.decode(
                     localStorage.getItem(key)
                 )
-                console.log(key)
             }
-            const saveData = fflate.zipSync(archive, {level: 0});
+            const zipFile = fflate.zipSync(
+                saveData, {level: 0}
+            );
             try {
                 ninjapad.utils.download(
-                    saveData, "savedata",
+                    zipFile, "savedata",
                     "application/zip"
                 );
             }
@@ -246,10 +247,44 @@ ninjapad.menu = function() {
         },
 
         importSaveData: function() {
-            showMessage(
-                "Not implemented yet",
-                returnToOptionsMenu
-            );
+            ninjapad.jQElement.uploadZIP.trigger("click");
+
+            const inputElement = document.getElementById("uploadZIP");
+            inputElement.addEventListener("change", handleFiles, false);
+
+            function handleFiles() {
+                inputElement.removeEventListener("change", handleFiles);
+                const file = ninjapad.utils.getFile(inputElement);
+                if (!file) return false;
+                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                const reader = new FileReader();
+                reader.onload = function () {
+                    try {
+                        const zipFile = new Uint8Array(reader.result);
+                        const saveData = fflate.unzipSync(zipFile);
+                        for (const key in saveData) {
+                            localStorage[key] = uint8ToUtf16.encode(
+                                saveData[key]
+                            )
+                        }
+                        showMessage(
+                            "Import successful",
+                            returnToOptionsMenu
+                        );
+                        return true;
+                    }
+                    catch (e) {
+                        showMessage(
+                            `Error<br/><br/>${e.message.strip(".")}`,
+                            returnToRecorderMenu
+                        );
+                        DEBUG && console.log(e);
+                        return false;
+                    }
+                }
+                reader.readAsArrayBuffer(file);
+                return true;
+            }
         },
 
         reset: function() {
@@ -411,9 +446,9 @@ ninjapad.menu = function() {
             },
 
             import: function() {
-                ninjapad.jQElement.uploadRec.trigger("click");
+                ninjapad.jQElement.uploadZIP.trigger("click");
 
-                const inputElement = document.getElementById("uploadRec");
+                const inputElement = document.getElementById("uploadZIP");
                 inputElement.addEventListener("change", handleFiles, false);
 
                 function handleFiles() {
