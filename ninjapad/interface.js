@@ -320,6 +320,15 @@ ninjapad.interface = {
             ninjapad.layout.showButtonPress(b, false);
         }
 
+        function getROMHash() {
+            const data = nes.romData;
+            const arr = [];
+            for (var i = 16; i < data.length; ++i) {
+                arr.push(data.charCodeAt(i));
+            }
+            return sha1(arr).toUpperCase();
+        }
+
         // If you wish to create your own interface,
         // you need to provide the exact same keys
         return {
@@ -394,6 +403,15 @@ ninjapad.interface = {
 
             getROMData: function() {
                 return nes.romData;
+            },
+
+            getROMHash: function() {
+                return getROMHash();
+            },
+
+            getROMName: function() {
+                const hash = getROMHash();
+                return ninjapad.gameList[hash];
             },
 
             saveState: function() {

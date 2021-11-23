@@ -1,7 +1,10 @@
+var XXX;
 const ninjapad = {
     emulator: null,
 
     jQElement: null,
+
+    gameList: null,
 
     boot: async function() {
         function loadScript(url) {
@@ -16,6 +19,7 @@ const ninjapad = {
 
         // Load JavaScript files
         await loadScript("ninjapad/config/settings.js");
+        await loadScript("ninjapad/lib/sha-1/sha-1.js");
         await loadScript("ninjapad/lib/sha256/sha256.js");
         await loadScript("ninjapad/lib/fflate/fflate.min.js");
         await loadScript("ninjapad/lib/uint8-to-utf16/uint8-to-utf16.js");
@@ -29,8 +33,13 @@ const ninjapad = {
 
         // Load HTML files
         await fetch("ninjapad/ninjapad.html")
-          .then(data => data.text())
-          .then(html => document.body.innerHTML += html);
+            .then(data => data.text())
+            .then(html => document.body.innerHTML += html);
+
+        ninjapad.gameList = JSON.parse(
+            await fetch("ninjapad/res/games.json")
+                .then(response => response.text())
+        );
     },
 
     initialize: function() {
