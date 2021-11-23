@@ -183,8 +183,11 @@ ninjapad.menu = function() {
                 showMessage("No ROM loaded", returnToMainMenu);
                 return;
             }
-            const hash = sha256(romData);
-            const data = localStorage.getItem(id + hash);
+            const hash = ninjapad.emulator.getROMHash();
+            const data = (
+                localStorage.getItem(id + hash) ||
+                localStorage.getItem(id + sha256(romData))
+            );
             if (!data) {
                 showMessage("No save data", returnToMainMenu);
                 return {id: hash, result: false};
@@ -209,7 +212,7 @@ ninjapad.menu = function() {
                 showMessage("No ROM loaded", returnToMainMenu);
                 return {id: null, result: false};
             }
-            const hash = sha256(romData);
+            const hash = ninjapad.emulator.getROMHash();
             const data = ninjapad.emulator.saveState();
             try {
                 const optimizedData = uint8ToUtf16.encode(data);
@@ -260,20 +263,32 @@ ninjapad.menu = function() {
                 const reader = new FileReader();
                 reader.onload = function () {
                     try {
-                        const regexSHA256 = /^[a-f0-9]{64}$/gi;
+                        var expected = 0;
+                        var imported = 0;
+                        const regexSHA1 = /^[a-f0-9]{40}$/i;
+                        const regexSHA256 = /^[a-f0-9]{64}$/i;
                         const zipFile = new Uint8Array(reader.result);
                         const saveData = fflate.unzipSync(zipFile);
                         for (const key in saveData) {
-                            var k = key.startsWith('auto') ?
-                                key.slice(4) : key;
-                            if (!regexSHA256.test(k)) continue;
-                            // - - - - - - - - - - - - - - - - -
+                            ++expected;
+                            const k = key.startsWith("auto") ? key.slice(4) : key;
+                            const isValidKey = regexSHA1.test(k) || regexSHA256.test(k);
+                            if (!isValidKey) {
+                                DEBUG && console.log("NinjaPad: Cannot import", key);
+                                continue;
+                            }
+                            // - - - - - - - - - - - -
+                            ++imported;
                             localStorage[key] = uint8ToUtf16.encode(
                                 saveData[key]
                             )
                         }
                         showMessage(
-                            "Import successful",
+                            imported ? (
+                                imported < expected ?
+                                    "Some files could not be imported" :
+                                    "Import successful"
+                                ) : "Nothing to import",
                             returnToOptionsMenu
                         );
                         return true;

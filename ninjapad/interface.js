@@ -82,7 +82,6 @@ ninjapad.interface = {
             onFrame: function(framebuffer_24) {
                 for (var i = 0; i < FRAMEBUFFER_SIZE; i++) framebuffer_u32[i] = 0xFF000000 | framebuffer_24[i];
                 ninjapad.recorder.read(frameCounter) || ninjapad.recorder.write(frameCounter);
-                //console.log(frameCounter, sha256(nes.cpu.mem));
                 ++frameCounter;
             },
             onAudioSample: function(l, r) {

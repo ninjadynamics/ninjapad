@@ -42,7 +42,7 @@ ninjapad.recorder = function() {
     }
 
     function isValidInitialState(replay) {
-        const h = sha256(ninjapad.emulator.getROMData());
+        const h = ninjapad.emulator.getROMHash();
         if (h != replay.romHash) {
             errorMessage = "ROM file mismatch";
             DEBUG && console.log("NinjaPad:", errorMessage);
@@ -107,9 +107,8 @@ ninjapad.recorder = function() {
             ninjapad.emulator.pause();
             ninjapad.emulator.resetFrameCount();
             saveData = ninjapad.emulator.saveState();
-            const romData = ninjapad.emulator.getROMData();
             const snapshot = ninjapad.emulator.memory();
-            romHash = sha256(romData);
+            romHash = ninjapad.emulator.getROMHash();
             initialState = sha256(snapshot);
             finalState = undefined;
             lastFrame = 0; endFrame = lastFrame;
