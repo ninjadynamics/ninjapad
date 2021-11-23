@@ -260,9 +260,14 @@ ninjapad.menu = function() {
                 const reader = new FileReader();
                 reader.onload = function () {
                     try {
+                        const regexSHA256 = /^[a-f0-9]{64}$/gi;
                         const zipFile = new Uint8Array(reader.result);
                         const saveData = fflate.unzipSync(zipFile);
                         for (const key in saveData) {
+                            var k = key.startsWith('auto') ?
+                                key.slice(4) : key;
+                            if (!regexSHA256.test(k)) continue;
+                            // - - - - - - - - - - - - - - - - -
                             localStorage[key] = uint8ToUtf16.encode(
                                 saveData[key]
                             )
