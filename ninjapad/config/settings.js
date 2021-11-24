@@ -9,6 +9,7 @@ const SCREEN = "emu-screen";
 const DISPLAY = "emu-canvas";
 
 // Emulation settings
+const SYSTEM = "nes";
 const EMULATOR = "jsnes";
 const DEFAULT_ROM = "roms/logo.nes";
 

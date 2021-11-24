@@ -117,8 +117,8 @@ ninjapad.menu = function() {
     }
 
     function showMessage(msg, backtap) {
+        DEBUG && console.log("NinjaPad:", msg);
         if (!ninjapad.pause.state.isEmulationPaused) {
-            DEBUG && console.log("NinjaPad:", msg);
             return;
         }
         ninjapad.pause.setScreenContent(
@@ -320,6 +320,15 @@ ninjapad.menu = function() {
             const inputElement = document.getElementById("uploadROM");
             inputElement.addEventListener("change", handleFiles, false);
 
+            function logSuccessulROMLoad(title) {
+                console.log(
+                    `NinjaPad: ROM loaded [${
+                        ninjapad.emulator.getROMName() ||
+                        title.split("/").pop()
+                    }]`,
+                );
+            }
+
             function handleFiles() {
                 inputElement.removeEventListener("change", handleFiles);
                 const file = ninjapad.utils.getFile(inputElement);
@@ -331,6 +340,7 @@ ninjapad.menu = function() {
                 reader.onload = function () {
                     try {
                         ninjapad.emulator.loadROMData(reader.result);
+                        DEBUG && logSuccessulROMLoad(file.name);
                         ninjapad.menu.inputRecorder.ready();
                         ninjapad.recorder.clear();
                         ninjapad.autoload();
@@ -391,6 +401,7 @@ ninjapad.menu = function() {
                     countdown = null;
                     return;
                 }
+                // ninjapad.autosave(); -- TODO: Use web worker instead
                 var color_on = ninjapad.utils.getCSSVar("#menu", "color_on");
                 ninjapad.utils.changeButtonColor("#menu", color_on, glow=true);
                 openMenu(mainMenu, closeMenuAndResumeEmulation);

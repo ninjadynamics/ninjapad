@@ -1,4 +1,4 @@
-var XXX;
+
 const ninjapad = {
     emulator: null,
 
@@ -36,8 +36,9 @@ const ninjapad = {
             .then(data => data.text())
             .then(html => document.body.innerHTML += html);
 
+        // Load game database
         ninjapad.gameList = JSON.parse(
-            await fetch("ninjapad/res/games.json")
+            await fetch(`ninjapad/db/${SYSTEM}.json`)
                 .then(response => response.text())
         );
     },
@@ -86,8 +87,8 @@ const ninjapad = {
             const output = ninjapad.menu.saveState("auto", resume=false);
             DEBUG && console.log(
                 "NinjaPad:", output.result == true ?
-                `Autosaved ${output.id.substring(48)}` :
-                `Autosave failed for ${output.id.substring(48)}`
+                `ROM state saved (auto)` :
+                `Unable to save ROM state (auto)`
             );
         }
     },
@@ -96,10 +97,8 @@ const ninjapad = {
         const isROMLoaded = ninjapad.emulator.isROMLoaded();
         if (isROMLoaded) {
             const output = ninjapad.menu.loadState("auto", resume=false);
-            DEBUG && console.log(
-                "NinjaPad:", output.result == true ?
-                `Autoloaded ${output.id.substring(48)}` :
-                `Autoload failed for ${output.id.substring(48)}`
+            DEBUG && output.result && console.log(
+                `NinjaPad: ROM state loaded (auto)`
             );
         }
     }

@@ -185,11 +185,19 @@ ninjapad.interface = {
             req.onerror = () => console.log(`Error loading ${path}: ${req.statusText}`);
             req.onload = function() {
                 if (this.status === 200) {
-                nes_boot(this.responseText);
-                if (callback) callback(...args);
-                } else if (this.status === 0) {
+                    nes_boot(this.responseText);
+                    DEBUG && console.log(
+                        `NinjaPad: ROM loaded [${
+                            ninjapad.gameList[getROMHash()] ||
+                            path.split("/").pop()
+                        }]`,
+                    );
+                    if (callback) callback(...args);
+                }
+                else if (this.status === 0) {
                     // Aborted, so ignore error
-                } else {
+                }
+                else {
                     req.onerror();
                 }
             };
@@ -325,7 +333,7 @@ ninjapad.interface = {
             for (var i = 16; i < data.length; ++i) {
                 arr.push(data.charCodeAt(i));
             }
-            return sha1(arr).toUpperCase();
+            return sha1(arr);
         }
 
         // If you wish to create your own interface,
