@@ -111,7 +111,83 @@ ninjapad.layout = function() {
         }
         else {
             setDesktopLayout();
-            handleLandscapeMode();
+            //ninjapad.jQElement.gamepad.height("100%");
+            ninjapad.jQElement.controller.show();
+
+            var w = ((width - ninjapad.jQElement.screen.width()) / 2);
+
+            $("#GAMEPAD-BUTTONS").detach().appendTo("body");
+
+            var s = w * 0.8;
+            var o = (w / 2) - (s / 2);
+
+            $("#DPAD").css("top", "50%");
+            $("#DPAD").css("left", o);
+            $("#DPAD").css("width", s);
+            $("#DPAD").css("height", s);
+
+            $("#ANALOG").css("top", "50%");
+            $("#ANALOG").css("left", o);
+            $("#ANALOG").css("width", s);
+            $("#ANALOG").css("height", s);
+
+            $("#ACTION").css("top", "50%");
+            $("#ACTION").css("right", o);
+            $("#ACTION").css("width", s);
+            $("#ACTION").css("height", s);
+
+
+
+
+            var bSel = $("#BUTTON_SELECT").detach();
+            var bStr = $("#BUTTON_START").detach();
+
+            var bAnl = $("#analogSwitch").detach();
+            var bMen = $("#menu").detach();
+
+            var functionalLeft = $("#FUNCTIONAL").clone();
+            var functionalRight = $("#FUNCTIONAL").clone();
+
+            $("#FUNCTIONAL").hide();
+
+            bSel.appendTo(functionalLeft);
+            bStr.appendTo(functionalRight);
+
+            bAnl.appendTo(functionalLeft);
+            bMen.appendTo(functionalRight);
+
+            functionalLeft
+                .appendTo("#GAMEPAD-BUTTONS")
+                .removeClass("middleButtons")
+                .addClass("funcLandscape")
+                .prop('id', 'FUNCTIONAL-L');
+
+            functionalRight
+                .appendTo("#GAMEPAD-BUTTONS")
+                .removeClass("middleButtons")
+                .addClass("funcLandscape")
+                .prop('id', 'FUNCTIONAL-R');
+
+
+            var s = s / 3;
+            var o = (w / 2) - (s / 2);
+
+            functionalLeft.css("bottom", "60%");
+            functionalLeft.css("left", o)
+
+            functionalRight.css("bottom", "60%");
+            functionalRight.css("right", o)
+
+            bSel.css("top", bMen.css("top"));
+            bAnl.css("top", bStr.css("top"));
+
+            bStr.css("top", bSel.css("top"));
+            bMen.css("top", bAnl.css("top"));
+
+
+
+            // $("#DPAD").show();
+            //handleLandscapeMode();
             DEBUG && console.log("NinjaPad: Touch controls disabled");
         }
     }
