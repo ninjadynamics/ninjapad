@@ -186,6 +186,20 @@ ninjapad.utils = function() {
             return (v * w) / 100;
         },
 
+        vh: function(v) {
+            let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+            return (v * h) / 100;
+        },
+
+        vmin: function(v) {
+            let w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+            let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+            return Math.min(
+                (v * w) / 100,
+                (v * h) / 100
+            );
+        },
+
         dist: function(dx, dy) {
             return Math.sqrt((dx * dx) + (dy * dy));
         },

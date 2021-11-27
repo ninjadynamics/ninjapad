@@ -111,33 +111,37 @@ ninjapad.layout = function() {
         }
         else {
             setDesktopLayout();
-            //ninjapad.jQElement.gamepad.height("100%");
+            ninjapad.jQElement.gamepad.height("100%");
             ninjapad.jQElement.controller.show();
 
             var w = ((width - ninjapad.jQElement.screen.width()) / 2);
 
-            $("#GAMEPAD-BUTTONS").detach().appendTo("body");
+            $("#GAMEPAD").show();
+            $("#GAMEPAD").css("top", "0px");
+            $("#SCREEN").detach().appendTo("#GAMEPAD");
+            //$("#GAMEPAD-BUTTONS").detach().appendTo("body");
+            //$("#SCREEN").detach().appendTo("#GAMEPAD");
+            //$("#SCREEN").css("position", "absolute");
 
             var s = w * 0.8;
             var o = (w / 2) - (s / 2);
 
-            $("#DPAD").css("top", "50%");
+            $("#DPAD").css("top", "40%");
             $("#DPAD").css("left", o);
             $("#DPAD").css("width", s);
             $("#DPAD").css("height", s);
 
-            $("#ANALOG").css("top", "50%");
+            $("#ANALOG").css("top", "40%");
             $("#ANALOG").css("left", o);
             $("#ANALOG").css("width", s);
             $("#ANALOG").css("height", s);
 
-            $("#ACTION").css("top", "50%");
+            $("#ACTION").css("top", "40%");
             $("#ACTION").css("right", o);
             $("#ACTION").css("width", s);
             $("#ACTION").css("height", s);
 
-
-
+            // - - - - - - - - - - - - - - - - - - -
 
             var bSel = $("#BUTTON_SELECT").detach();
             var bStr = $("#BUTTON_START").detach();
@@ -169,13 +173,18 @@ ninjapad.layout = function() {
                 .prop('id', 'FUNCTIONAL-R');
 
 
-            var s = s / 3;
-            var o = (w / 2) - (s / 2);
+            var fw = s / 3;
+            var fh = functionalLeft.height() * (fw / functionalLeft.width());
+            o = (w / 2) - (fw / 2);
 
-            functionalLeft.css("bottom", "60%");
+            functionalLeft.css("width", fw);
+            functionalLeft.css("height", fh);
+            functionalLeft.css("bottom", "70%");
             functionalLeft.css("left", o)
 
-            functionalRight.css("bottom", "60%");
+            functionalRight.css("width", fw);
+            functionalRight.css("height", fh);
+            functionalRight.css("bottom", "70%");
             functionalRight.css("right", o)
 
             bSel.css("top", bMen.css("top"));

@@ -90,7 +90,7 @@ ninjapad.gamepad = function() {
                         analog.deltaY = touch.clientY - analog.touchY;
 
                         let r = ninjapad.utils.angle(analog.deltaX, analog.deltaY);
-                        let d = Math.min(ninjapad.utils.vw(10), ninjapad.utils.dist(analog.deltaX, analog.deltaY));
+                        let d = Math.min(ninjapad.utils.vmin(10), ninjapad.utils.dist(analog.deltaX, analog.deltaY));
 
                         let dx = Math.cos(r) * d;
                         let dy = Math.sin(r) * d;
@@ -100,7 +100,7 @@ ninjapad.gamepad = function() {
                         );
                         let btnIndex = Math.floor(((180 + (45/2) + (r * 180 / Math.PI)) % 360) / 45);
                         analog.padBtn && pressButtons(ninjapad.emulator.buttonUp, analog.padBtn);
-                        analog.padBtn = d < ninjapad.utils.vw(DEADZONE) ? null : DPAD_BUTTONS[btnIndex];
+                        analog.padBtn = d < ninjapad.utils.vmin(DEADZONE) ? null : DPAD_BUTTONS[btnIndex];
                         analog.padBtn && pressButtons(ninjapad.emulator.buttonDown, analog.padBtn);
                         break;
 
