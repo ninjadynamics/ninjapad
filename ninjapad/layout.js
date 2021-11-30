@@ -123,20 +123,23 @@ ninjapad.layout = function() {
             //$("#SCREEN").detach().appendTo("#GAMEPAD");
             //$("#SCREEN").css("position", "absolute");
 
-            var s = w * 0.8;
+            var s = w * 0.85;
             var o = (w / 2) - (s / 2);
 
-            $("#DPAD").css("top", "40%");
+            $("#DPAD").css("top", "auto");
+            $("#DPAD").css("bottom", "45%");
             $("#DPAD").css("left", o);
             $("#DPAD").css("width", s);
             $("#DPAD").css("height", s);
 
-            $("#ANALOG").css("top", "40%");
+            $("#ANALOG").css("top", "auto");
+            $("#ANALOG").css("bottom", "45%");
             $("#ANALOG").css("left", o);
             $("#ANALOG").css("width", s);
             $("#ANALOG").css("height", s);
 
-            $("#ACTION").css("top", "40%");
+            $("#ACTION").css("top", "auto");
+            $("#ACTION").css("bottom", "45%");
             $("#ACTION").css("right", o);
             $("#ACTION").css("width", s);
             $("#ACTION").css("height", s);
@@ -149,10 +152,12 @@ ninjapad.layout = function() {
             var bAnl = $("#analogSwitch").detach();
             var bMen = $("#menu").detach();
 
-            var functionalLeft = $("#FUNCTIONAL").clone();
-            var functionalRight = $("#FUNCTIONAL").clone();
+            var functionalLeft = $("#FUNCTIONAL-BL");
+            var functionalRight = $("#FUNCTIONAL-TR");
 
-            $("#FUNCTIONAL").hide();
+            functionalLeft.appendTo("#GAMEPAD-BUTTONS");
+
+            functionalRight.appendTo("#GAMEPAD-BUTTONS");
 
             bSel.appendTo(functionalLeft);
             bStr.appendTo(functionalRight);
@@ -160,38 +165,28 @@ ninjapad.layout = function() {
             bAnl.appendTo(functionalLeft);
             bMen.appendTo(functionalRight);
 
-            functionalLeft
-                .appendTo("#GAMEPAD-BUTTONS")
-                .removeClass("middleButtons")
-                .addClass("funcLandscape")
-                .prop('id', 'FUNCTIONAL-L');
-
-            functionalRight
-                .appendTo("#GAMEPAD-BUTTONS")
-                .removeClass("middleButtons")
-                .addClass("funcLandscape")
-                .prop('id', 'FUNCTIONAL-R');
-
-
             var fw = s / 3;
             var fh = functionalLeft.height() * (fw / functionalLeft.width());
             o = (w / 2) - (fw / 2);
 
             functionalLeft.css("width", fw);
             functionalLeft.css("height", fh);
-            functionalLeft.css("bottom", "70%");
-            functionalLeft.css("left", o)
+            functionalLeft.css("top", "65%");
+            functionalLeft.css("left", o);
+            functionalLeft.css("right", "auto");
 
             functionalRight.css("width", fw);
             functionalRight.css("height", fh);
-            functionalRight.css("bottom", "70%");
-            functionalRight.css("right", o)
+            functionalRight.css("top", "65%");
+            functionalRight.css("left", "auto");
+            functionalRight.css("right", o);
 
-            bSel.css("top", bMen.css("top"));
-            bAnl.css("top", bStr.css("top"));
+            bStr.css("top", bAnl.css("top"));
+            bMen.css("top", bSel.css("top"));
 
-            bStr.css("top", bSel.css("top"));
-            bMen.css("top", bAnl.css("top"));
+            bSel.css("top", bAnl.css("top"));
+            bAnl.css("top", bMen.css("top"));
+
 
 
 

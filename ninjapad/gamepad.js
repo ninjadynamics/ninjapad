@@ -118,6 +118,8 @@ ninjapad.gamepad = function() {
             // Get the source element
             target = event.target;
 
+            const bgcolor = "rgba(255, 255, 255, 0.03)"; // TODO: get it from boot
+
             // Handle the touch
             for (const touch of event.changedTouches) {
                 // Ignore any touches where the target
@@ -159,7 +161,10 @@ ninjapad.gamepad = function() {
                         }
                         // Show button release (shadow button)
                         if (buttonPresses[lastButton.id] == PRESSED) {
-                            $(lastButton).css("background-color", "transparent");
+                            $(lastButton).css(
+                                "background-color",
+                                lastButton.id == "MULTI_AB" ? bgcolor : "transparent"
+                            );
                             DEBUG && console.log("NinjaPad: Released", lastButton.id); // Debug
                             buttonPresses[lastButton.id] = RELEASED;
                         }
@@ -168,7 +173,7 @@ ninjapad.gamepad = function() {
                     childButton[target.id] = element;
                 }
 
-                // If the user is actually interacting a button right now
+                // If the user is interacting with a single button
                 let isPressed = isButtonDown(event.type);
                 let interactWith = fnButtonPress(event.type);
                 if (element.id.startsWith("BUTTON")) {
@@ -178,7 +183,8 @@ ninjapad.gamepad = function() {
                         buttonPresses[element.id] = isPressed;
                     }
                 }
-                // Otherwise, if it's actually two buttons at the same time
+                // Otherwise, if the interaction corresponds
+                // to two buttons at the same time
                 else if (element.id.startsWith("MULTI")) {
                     // Get buttons and press / release them
                     let key = element.id.split("_").pop();
@@ -191,7 +197,12 @@ ninjapad.gamepad = function() {
                     // Show button press / release (shadow button)
                     if (buttonPresses[element.id] == isPressed) continue;
                     // - - - - - - - - - - - - - - - - - - - - - - - - - -
-                    $(element).css("background-color", isPressed ? "#444" : "transparent");
+                    $(element).css(
+                        "background-color",
+                        isPressed ? "#444" : (
+                            element.id == "MULTI_AB" ?  bgcolor : "transparent"
+                        )
+                    );
                     DEBUG && console.log("NinjaPad:", isPressed ? "Pressed" : "Released", element.id);
                     buttonPresses[element.id] = isPressed;
                 }
