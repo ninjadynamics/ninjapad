@@ -88,21 +88,22 @@ ninjapad.layout = function() {
 
             $("#GAMEPAD").removeAttr("style");
 
-            $("#DPAD").removeAttr("style");
+            var dPadState = $("#DPAD").css("display");
+            $("#DPAD").removeAttr("style").css("display", dPadState);
 
-            var isAnalogON = $("#ANALOG").css("display");
-            $("#ANALOG").removeAttr("style").css("display", isAnalogON);
+            var analogState = $("#ANALOG").css("display");
+            $("#ANALOG").removeAttr("style").css("display", analogState);
 
             $("#ACTION").removeAttr("style");
 
             $("#FUNCTIONAL-TR").removeAttr("style");
             $("#FUNCTIONAL-BL").removeAttr("style");
 
-            $("#BUTTON_SELECT").removeAttr("style").detach().appendTo("#FUNCTIONAL-TR");
-            $("#BUTTON_START").removeAttr("style").detach().appendTo("#FUNCTIONAL-BL");
+            $("#BUTTON_SELECT").css("top", "").detach().appendTo("#FUNCTIONAL-TR");
+            $("#BUTTON_START").css("top", "").detach().appendTo("#FUNCTIONAL-BL");
 
-            $("#analogSwitch").removeAttr("style").detach().appendTo("#FUNCTIONAL-TR");
-            $("#menu").removeAttr("style").detach().appendTo("#FUNCTIONAL-BL");
+            $("#analogSwitch").css("top", "").detach().appendTo("#FUNCTIONAL-TR");
+            $("#menu").css("top", "").detach().appendTo("#FUNCTIONAL-BL");
 
             let opacity = 1;
             let bottom = "auto";
