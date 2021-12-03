@@ -107,6 +107,7 @@ ninjapad.layout = function() {
             let bottom = "auto";
 
             ninjapad.jQElement.screen.width("100%");
+            ninjapad.jQElement.screen.css("top", "0vh");
             let newWidth = ninjapad.jQElement.screen.width();
             ninjapad.jQElement.screen.height(240 * (newWidth / 256));
 
@@ -133,8 +134,15 @@ ninjapad.layout = function() {
         }
         else {
             setDesktopLayout();
-            ninjapad.jQElement.gamepad.height("100%");
+
+            ninjapad.jQElement.screen.height("100vh"); //("90vh");
+            //ninjapad.jQElement.screen.css("top", "5vh");
+
+            ninjapad.jQElement.gamepad.height("100vh");
             ninjapad.jQElement.controller.show();
+
+            let newHeight = ninjapad.jQElement.screen.height();
+            ninjapad.jQElement.screen.width(256 * (newHeight / 240));
 
             var w = ((width - ninjapad.jQElement.screen.width()) / 2);
 
