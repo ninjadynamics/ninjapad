@@ -81,6 +81,28 @@ ninjapad.layout = function() {
         let height = useJQuery ? $(window).height() : window.innerHeight;
 
         if (height >= width || window.matchMedia("(orientation: portrait)").matches) {
+
+            $("#SCREEN").detach().appendTo("#ninjaPad");
+            $("#GAMEPAD").detach().appendTo("#ninjaPad");
+
+            $("#GAMEPAD").removeAttr("style");
+
+            $("#DPAD").removeAttr("style");
+
+            var isAnalogON = $("#ANALOG").css("display");
+            $("#ANALOG").removeAttr("style").css("display", isAnalogON);
+
+            $("#ACTION").removeAttr("style");
+
+            $("#FUNCTIONAL-TR").removeAttr("style");
+            $("#FUNCTIONAL-BL").removeAttr("style");
+
+            $("#BUTTON_SELECT").detach().appendTo("#FUNCTIONAL-TR");
+            $("#BUTTON_START").detach().appendTo("#FUNCTIONAL-BL");
+
+            $("#analogSwitch").detach().appendTo("#FUNCTIONAL-TR");
+            $("#menu").detach().appendTo("#FUNCTIONAL-BL");
+
             let opacity = 1;
             let bottom = "auto";
 
@@ -119,9 +141,6 @@ ninjapad.layout = function() {
             $("#GAMEPAD").show();
             $("#GAMEPAD").css("top", "0px");
             $("#SCREEN").detach().appendTo("#GAMEPAD");
-            //$("#GAMEPAD-BUTTONS").detach().appendTo("body");
-            //$("#SCREEN").detach().appendTo("#GAMEPAD");
-            //$("#SCREEN").css("position", "absolute");
 
             var s = w * 0.85;
             var o = (w / 2) - (s / 2);
@@ -155,10 +174,6 @@ ninjapad.layout = function() {
             var functionalLeft = $("#FUNCTIONAL-BL");
             var functionalRight = $("#FUNCTIONAL-TR");
 
-            functionalLeft.appendTo("#GAMEPAD-BUTTONS");
-
-            functionalRight.appendTo("#GAMEPAD-BUTTONS");
-
             bSel.appendTo(functionalLeft);
             bStr.appendTo(functionalRight);
 
@@ -188,10 +203,6 @@ ninjapad.layout = function() {
             bAnl.css("top", bMen.css("top"));
 
 
-
-
-            // $("#DPAD").show();
-            //handleLandscapeMode();
             DEBUG && console.log("NinjaPad: Touch controls disabled");
         }
     }
@@ -213,6 +224,7 @@ ninjapad.layout = function() {
     return {
         setPageLayout: function() {
             ninjapad.utils.isMobileDevice() ? setMobileLayout() : setDesktopLayout();
+            ninjapad.layout.analogStickMovementRadius = $("#ANALOG").width() / 4;
             setOSDLayout();
         },
 
