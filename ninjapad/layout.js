@@ -97,11 +97,11 @@ ninjapad.layout = function() {
             $("#FUNCTIONAL-TR").removeAttr("style");
             $("#FUNCTIONAL-BL").removeAttr("style");
 
-            $("#BUTTON_SELECT").detach().appendTo("#FUNCTIONAL-TR");
-            $("#BUTTON_START").detach().appendTo("#FUNCTIONAL-BL");
+            $("#BUTTON_SELECT").removeAttr("style").detach().appendTo("#FUNCTIONAL-TR");
+            $("#BUTTON_START").removeAttr("style").detach().appendTo("#FUNCTIONAL-BL");
 
-            $("#analogSwitch").detach().appendTo("#FUNCTIONAL-TR");
-            $("#menu").detach().appendTo("#FUNCTIONAL-BL");
+            $("#analogSwitch").removeAttr("style").detach().appendTo("#FUNCTIONAL-TR");
+            $("#menu").removeAttr("style").detach().appendTo("#FUNCTIONAL-BL");
 
             let opacity = 1;
             let bottom = "auto";
