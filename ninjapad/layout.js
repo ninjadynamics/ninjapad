@@ -82,6 +82,7 @@ ninjapad.layout = function() {
 
         if (height >= width || window.matchMedia("(orientation: portrait)").matches) {
 
+            $("#SCREEN").removeClass("verticalCenter");
             $("#SCREEN").detach().appendTo("#ninjaPad");
             $("#GAMEPAD").detach().appendTo("#ninjaPad");
 
@@ -106,8 +107,8 @@ ninjapad.layout = function() {
             let opacity = 1;
             let bottom = "auto";
 
-            ninjapad.jQElement.screen.width("100%");
-            ninjapad.jQElement.screen.css("top", "0vh");
+            ninjapad.jQElement.screen.width(window.innerWidth);
+            //ninjapad.jQElement.screen.css("top", "0vh");
             let newWidth = ninjapad.jQElement.screen.width();
             ninjapad.jQElement.screen.height(240 * (newWidth / 256));
 
@@ -133,22 +134,20 @@ ninjapad.layout = function() {
             DEBUG && console.log("NinjaPad: Touch controls enabled");
         }
         else {
-            setDesktopLayout();
+            //setDesktopLayout();
 
-            ninjapad.jQElement.screen.height("100vh"); //("90vh");
-            //ninjapad.jQElement.screen.css("top", "5vh");
-
-            ninjapad.jQElement.gamepad.height("100vh");
+            ninjapad.jQElement.gamepad.height(window.innerHeight);
             ninjapad.jQElement.controller.show();
 
+            $("#GAMEPAD").show();
+            $("#SCREEN").detach().appendTo("#GAMEPAD");
+            $("#SCREEN").addClass("verticalCenter");
+
+            ninjapad.jQElement.screen.height("100%"); //("90%");
             let newHeight = ninjapad.jQElement.screen.height();
             ninjapad.jQElement.screen.width(256 * (newHeight / 240));
 
             var w = ((width - ninjapad.jQElement.screen.width()) / 2);
-
-            $("#GAMEPAD").show();
-            $("#GAMEPAD").css("top", "0px");
-            $("#SCREEN").detach().appendTo("#GAMEPAD");
 
             var s = w * 0.85;
             var o = (w / 2) - (s / 2);

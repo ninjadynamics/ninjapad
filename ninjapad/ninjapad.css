@@ -102,6 +102,13 @@
     background: #444;
 }
 
+.verticalCenter {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    position: relative;   
+}
+
 .noselect {
     cursor: default;
     -webkit-touch-callout: none;
