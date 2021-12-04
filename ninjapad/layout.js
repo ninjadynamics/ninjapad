@@ -142,7 +142,7 @@ ninjapad.layout = function() {
 
             $("#GAMEPAD").show();
             $("#SCREEN").detach().appendTo("#GAMEPAD");
-            $("#SCREEN").addClass("verticalCenter");
+            //$("#SCREEN").addClass("verticalCenter");
 
             ninjapad.jQElement.screen.height("100%"); //("90%");
             let newHeight = ninjapad.jQElement.screen.height();
