@@ -137,7 +137,7 @@ ninjapad.layout = function() {
         else {
 
             var maxHeight = ninjapad.utils.isIOSDevice() ?
-                window.innerHeight : document.documentElement.clientHeight;
+                window.innerHeight : "100%";
 
             ninjapad.jQElement.gamepad.height(maxHeight);
             ninjapad.jQElement.controller.show();
