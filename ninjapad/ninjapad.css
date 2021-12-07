@@ -10,6 +10,7 @@
 }
 
 #OSD {
+    color: red;
     display: flex;
     position: absolute;
     text-align: center;
@@ -17,73 +18,33 @@
     align-content: center;
     flex-direction: column;
     font-family: Karmatic Arcade;
-    font-size: 5vmin;
     box-sizing: border-box;
-    padding: 2em;
-    word-spacing: 0.5em;
-    color: red;
     visibility: hidden;
     background-color: rgba(0, 0, 0, 0.8);
+    transform: translateZ(0);
 }
 
-/* unvisited link */
+#OSD a {
+  text-decoration: none;
+  margin: 0 auto;
+  display: inline-block;
+  transform: translateZ(0);
+}
+
 #OSD a:link {
   color: red;
-  text-decoration: none;
 }
 
-/* visited link */
 #OSD a:visited {
   color: red;
-  text-decoration: none;
 }
 
-/* mouse over link */
 #OSD a:hover {
    color: red;
-   text-decoration: none;
 }
 
-/* selected link */
 #OSD a:active {
    color: yellow;
-   text-decoration: none;
-}
-
-#REC_MENU {
-    display: flex;
-    position: absolute;
-    justify-content: right;
-    align-items: center;
-    font-size: 5vmin;
-    font-family: VCR OSD Mono;
-    color: white;
-    background-color: black;
-    padding: 1vmin;
-}
-
-/* unvisited link */
-#REC_MENU a:link {
-  color: white;
-  text-decoration: none;
-}
-
-/* visited link */
-#REC_MENU a:visited {
-  color: white;
-  text-decoration: none;
-}
-
-/* mouse over link */
-#REC_MENU a:hover {
-   color: white;
-   text-decoration: none;
-}
-
-/* selected link */
-#REC_MENU a:active {
-   color: yellow;
-   text-decoration: none;
 }
 
 #REC_STATUS {
@@ -91,11 +52,42 @@
     position: absolute;
     justify-content: left;
     align-items: center;
-    font-size: 5vmin;
     font-family: VCR OSD Mono;
     color: white;
     background-color: black;
-    padding: 1vmin;
+}
+
+#REC_MENU {
+    display: flex;
+    position: absolute;
+    justify-content: right;
+    align-items: center;
+    font-family: VCR OSD Mono;
+    color: white;
+    background-color: black;
+}
+
+#REC_MENU a:link {
+    text-decoration: none;
+    margin: 0 auto;
+    display: inline-block;
+    transform: translateZ(0);
+}
+
+#REC_MENU a:link {
+    color: white;
+}
+
+#REC_MENU a:visited {
+    color: white;
+}
+
+#REC_MENU a:hover {
+    color: white;
+}
+
+#REC_MENU a:active {
+    color: lime;
 }
 
 #DEADZONE {
@@ -161,7 +153,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: green;
 }
 
 .dpad {

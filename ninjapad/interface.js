@@ -450,7 +450,7 @@ ninjapad.interface = {
             },
 
             initialize: function(callback, ...args) {
-                nes_load_url(DISPLAY, DEFAULT_ROM, callback, ...args);
+                nes_load_url(EMULATION_DISPLAY, DEFAULT_ROM, callback, ...args);
             }
         };
     }()

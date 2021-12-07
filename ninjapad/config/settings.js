@@ -2,11 +2,11 @@
 const DEBUG = true;
 
 // Virtual analog deadzone
-const DEADZONE = 2; //vw
+const DEADZONE = 2; // vmin
 
 // Emulation screen
-const SCREEN = "emu-screen";
-const DISPLAY = "emu-canvas";
+const EMULATION_SCREEN = "emu-screen";
+const EMULATION_DISPLAY = "emu-canvas";
 
 // Emulation settings
 const SYSTEM = "nes";

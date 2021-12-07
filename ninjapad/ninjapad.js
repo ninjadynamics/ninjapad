@@ -46,7 +46,7 @@ const ninjapad = {
     initialize: function() {
         ninjapad.jQElement = {
             gamepad:        $("#GAMEPAD"),
-            controller:     $("#GAMEPAD-BUTTONS"),
+            gamepadButtons: $("#GAMEPAD-BUTTONS"),
             analogSwitch:   $("#analogSwitch"),
             menu:           $("#menu"),
             uploadROM:      $("#uploadROM"),
@@ -57,7 +57,7 @@ const ninjapad = {
             osd:            $("#OSD"),
             recMenu:        $("#REC_MENU"),
             recStatus:      $("#REC_STATUS"),
-            screen:         $("#" + SCREEN),
+            emuScreen:      $("#" + EMULATION_SCREEN),
         };
 
         // Input recorder
@@ -75,7 +75,7 @@ const ninjapad = {
         ninjapad.utils.assign(ninjapad.gamepad.analogSwitch, "analogSwitch", "start", "end");
         ninjapad.utils.assign(ninjapad.gamepad.buttonPress, "GAMEPAD-BUTTONS", "start", "move", "end");
         ninjapad.utils.assign(ninjapad.gamepad.analogTouch, "ANALOG_STICK", "start", "move", "end");
-        ninjapad.utils.assign(ninjapad.gamepad.toggleFullScreen, SCREEN, "end");
+        ninjapad.utils.assign(ninjapad.gamepad.toggleFullScreen, EMULATION_SCREEN, "end");
         ninjapad.utils.assign(null, "GAMEPAD"); // Do not remove this line !!!
 
         DEBUG && console.log("NinjaPad: Ready");
