@@ -38,18 +38,18 @@ ninjapad.layout = function() {
     function setDesktopLayout() {
         DEBUG && console.log("NinjaPad: Desktop mode selected");
 
-        let useJQuery = !ninjapad.utils.isFullScreen() || ninjapad.utils.isIOSDevice();
-        let width = useJQuery ? $(window).width() : window.innerWidth;
-        let height = useJQuery ? $(window).height() : window.innerHeight;
+        var useJQuery = !ninjapad.utils.isFullScreen() || ninjapad.utils.isIOSDevice();
+        var width = useJQuery ? $(window).width() : window.innerWidth;
+        var height = useJQuery ? $(window).height() : window.innerHeight;
 
         if (width > height) {
             ninjapad.jQElement.screen.height("100%");
-            let newHeight = ninjapad.jQElement.screen.height();
+            var newHeight = ninjapad.jQElement.screen.height();
             ninjapad.jQElement.screen.width(256 * (newHeight / 240));
         }
         else {
             ninjapad.jQElement.screen.width("100%");
-            let newWidth = ninjapad.jQElement.screen.width();
+            var newWidth = ninjapad.jQElement.screen.width();
             ninjapad.jQElement.screen.height(240 * (newWidth / 256));
         }
         ninjapad.jQElement.gamepad.height("0%");
@@ -76,9 +76,9 @@ ninjapad.layout = function() {
             coldStart = false;
         }
 
-        let useJQuery = !ninjapad.utils.isFullScreen() || ninjapad.utils.isIOSDevice();
-        let width = useJQuery ? $(window).width() : window.innerWidth;
-        let height = useJQuery ? $(window).height() : window.innerHeight;
+        var useJQuery = !ninjapad.utils.isFullScreen() || ninjapad.utils.isIOSDevice();
+        var width = useJQuery ? $(window).width() : window.innerWidth;
+        var height = useJQuery ? $(window).height() : window.innerHeight;
 
         if (height >= width || window.matchMedia("(orientation: portrait)").matches) {
 
@@ -105,19 +105,19 @@ ninjapad.layout = function() {
             $("#analogSwitch").css("top", "").detach().appendTo("#FUNCTIONAL-TR");
             $("#menu").css("top", "").detach().appendTo("#FUNCTIONAL-BL");
 
-            let opacity = 1;
-            let bottom = "auto";
+            var opacity = 1;
+            var bottom = "auto";
 
             ninjapad.jQElement.screen.width(window.innerWidth);
             //ninjapad.jQElement.screen.css("top", "0vh");
-            let newWidth = ninjapad.jQElement.screen.width();
+            var newWidth = ninjapad.jQElement.screen.width();
             ninjapad.jQElement.screen.height(240 * (newWidth / 256));
 
-            let padHeight = ninjapad.utils.vw(47.5);
-            let remainingHeight = height - ninjapad.jQElement.screen.height();
+            var padHeight = ninjapad.utils.vw(47.5);
+            var remainingHeight = height - ninjapad.jQElement.screen.height();
             ninjapad.jQElement.gamepad.height(Math.max(padHeight, remainingHeight));
 
-            let difference = remainingHeight - padHeight;
+            var difference = remainingHeight - padHeight;
             if (difference < 0) {
                 opacity += (difference / (padHeight * 2));
                 bottom = 0;
@@ -135,9 +135,11 @@ ninjapad.layout = function() {
             DEBUG && console.log("NinjaPad: Touch controls enabled");
         }
         else {
-            //setDesktopLayout();
 
-            ninjapad.jQElement.gamepad.height(window.innerHeight);
+            var maxHeight = ninjapad.utils.isIOSDevice() ?
+                window.innerHeight : document.documentElement.clientHeight;
+
+            ninjapad.jQElement.gamepad.height(maxHeight);
             ninjapad.jQElement.controller.show();
 
             $("#GAMEPAD").show();
@@ -145,7 +147,7 @@ ninjapad.layout = function() {
             //$("#SCREEN").addClass("verticalCenter");
 
             ninjapad.jQElement.screen.height("100%"); //("90%");
-            let newHeight = ninjapad.jQElement.screen.height();
+            var newHeight = ninjapad.jQElement.screen.height();
             ninjapad.jQElement.screen.width(256 * (newHeight / 240));
 
             var w = ((width - ninjapad.jQElement.screen.width()) / 2);
