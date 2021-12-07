@@ -4,9 +4,15 @@
 }
 
 #GAMEPAD {
-    position: absolute;
-    width: 100%;
     display: none;
+    position: absolute;
+    align-items: center;
+    width: 100%;
+}
+
+#SCREEN {
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #OSD {

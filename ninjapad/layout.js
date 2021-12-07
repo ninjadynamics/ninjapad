@@ -98,7 +98,6 @@ ninjapad.layout = function() {
 
         if (height >= width || window.matchMedia("(orientation: portrait)").matches) {
 
-            $("#SCREEN").removeClass("verticalCenter");
             $("#SCREEN").detach().appendTo("#ninjaPad");
             $("#GAMEPAD").detach().appendTo("#ninjaPad");
 
@@ -152,24 +151,30 @@ ninjapad.layout = function() {
         }
         else {
 
-            var maxHeight = ninjapad.utils.isIOSDevice() ?
-                window.innerHeight : "100%";
+            // var maxHeight = ninjapad.utils.isIOSDevice() ?
+            //     window.innerHeight : "100%";
 
-            ninjapad.jQElement.gamepad.css("height", maxHeight);
-            ninjapad.jQElement.gamepadButtons.show();
+            // Display the GAMEPAD element and set the height to 100%
+            ninjapad.jQElement.gamepad.css("display", "block");
+            ninjapad.jQElement.gamepad.css("height", window.innerHeight);
 
-            $("#GAMEPAD").show();
+            // Nest the SCREEN element on the GAMEPAD element
             $("#SCREEN").detach().appendTo("#GAMEPAD");
-            //$("#SCREEN").addClass("verticalCenter");
 
-            ninjapad.jQElement.emuScreen.height("100%"); //("90%");
+            // Set the EMULATION_SCREEN element height to 100%
+            ninjapad.jQElement.emuScreen.height("90%"); //("90%");
             var newHeight = ninjapad.jQElement.emuScreen.height();
             ninjapad.jQElement.emuScreen.width(256 * (newHeight / 240));
 
+            // Center the SCREEN element vertically
+            ninjapad.jQElement.gamepad.css("display", "flex");
+
+            // Get the width of the empty sides
             var w = ((width - ninjapad.jQElement.emuScreen.width()) / 2);
 
+            // Calculate the maximum size for the button areas
             var s = 0.85 * Math.min(w, ninjapad.utils.vmin(55));
-            var o = (w / 2) - (s / 2);
+            var o = (w / 2) - (s / 2); // Offset
 
             $("#DPAD").css("top", "auto");
             $("#DPAD").css("bottom", "45%");
@@ -228,6 +233,8 @@ ninjapad.layout = function() {
             bSel.css("top", bAnl.css("top"));
             bAnl.css("top", bMen.css("top"));
 
+            // Show buttons
+            ninjapad.jQElement.gamepadButtons.show();
 
             DEBUG && console.log("NinjaPad: Touch controls disabled");
         }
