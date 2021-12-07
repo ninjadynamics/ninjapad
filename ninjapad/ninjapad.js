@@ -2,7 +2,7 @@
 const ninjapad = {
     emulator: null,
 
-    jQElement: null,
+    elements: null,
 
     gameList: null,
 
@@ -44,7 +44,7 @@ const ninjapad = {
     },
 
     initialize: function() {
-        ninjapad.jQElement = {
+        ninjapad.elements = {
             gamepad:        $("#GAMEPAD"),
             gamepadButtons: $("#GAMEPAD-BUTTONS"),
             analogSwitch:   $("#analogSwitch"),

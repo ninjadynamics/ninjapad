@@ -97,7 +97,7 @@ ninjapad.gamepad = function() {
 
                         let dx = Math.cos(r) * d;
                         let dy = Math.sin(r) * d;
-                        ninjapad.jQElement.analogStick.css(
+                        ninjapad.elements.analogStick.css(
                             "transform",
                             "translate(" + dx + "px, " + dy + "px)"
                         );
@@ -109,7 +109,7 @@ ninjapad.gamepad = function() {
 
                     default:
                         analog.padBtn && pressButtons(ninjapad.emulator.buttonUp, analog.padBtn);
-                        analogReset(ninjapad.jQElement.analogStick);
+                        analogReset(ninjapad.elements.analogStick);
                 }
             }
         },
@@ -215,35 +215,35 @@ ninjapad.gamepad = function() {
         analogSwitch: function(event) {
             event.preventDefault();
             if (event.type == "touchstart") {
-                ninjapad.jQElement.analogSwitch.css("border-style", "inset");
+                ninjapad.elements.analogSwitch.css("border-style", "inset");
                 return;
             }
-            ninjapad.jQElement.analogSwitch.css("border-style", "outset");
+            ninjapad.elements.analogSwitch.css("border-style", "outset");
 
             var color_off = ninjapad.utils.getCSSVar("#analogSwitch", "color");
             var color_on = ninjapad.utils.getCSSVar("#analogSwitch", "color_on");
 
-            if (ninjapad.jQElement.analog.css("display") == "none") {
+            if (ninjapad.elements.analog.css("display") == "none") {
                 analog.active = true;
-                ninjapad.jQElement.dpad.hide();
-                ninjapad.jQElement.analog.show();
-                analogReset(ninjapad.jQElement.analog);
+                ninjapad.elements.dpad.hide();
+                ninjapad.elements.analog.show();
+                analogReset(ninjapad.elements.analog);
                 ninjapad.utils.changeButtonColor("#analogSwitch", color_on, glow=true);
                 return;
             }
             analog.active = false;
-            ninjapad.jQElement.analog.hide();
-            ninjapad.jQElement.dpad.show();
+            ninjapad.elements.analog.hide();
+            ninjapad.elements.dpad.show();
             ninjapad.utils.changeButtonColor("#analogSwitch", color_off);
         },
 
         toggleMainMenu: function(event) {
             event.preventDefault();
             if (event.type == "touchstart") {
-                ninjapad.jQElement.menu.css("border-style", "inset");
+                ninjapad.elements.menu.css("border-style", "inset");
                 return;
             }
-            ninjapad.jQElement.menu.css("border-style", "outset");
+            ninjapad.elements.menu.css("border-style", "outset");
             ninjapad.menu.toggle.mainMenu();
         },
 

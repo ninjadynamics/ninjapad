@@ -250,7 +250,7 @@ ninjapad.menu = function() {
         },
 
         importSaveData: function() {
-            ninjapad.jQElement.uploadZIP.trigger("click");
+            ninjapad.elements.uploadZIP.trigger("click");
 
             const inputElement = document.getElementById("uploadZIP");
             inputElement.addEventListener("change", handleFiles, false);
@@ -315,7 +315,7 @@ ninjapad.menu = function() {
         },
 
         uploadROM: function() {
-            ninjapad.jQElement.uploadROM.trigger("click");
+            ninjapad.elements.uploadROM.trigger("click");
 
             const inputElement = document.getElementById("uploadROM");
             inputElement.addEventListener("change", handleFiles, false);
@@ -414,7 +414,7 @@ ninjapad.menu = function() {
 
         inputRecorder: {
             show: function() {
-                ninjapad.jQElement.recMenu.html(`
+                ninjapad.elements.recMenu.html(`
                     <div><a href="#" onclick="ninjapad.menu.open.inputRecorder();">
                         VCR MENU
                     </a></div>
@@ -422,7 +422,7 @@ ninjapad.menu = function() {
             },
 
             ready: function() {
-                ninjapad.jQElement.recStatus.html(`
+                ninjapad.elements.recStatus.html(`
                     <div>READY</div>
                 `);
             },
@@ -437,7 +437,7 @@ ninjapad.menu = function() {
                     clearInterval(countdown);
                     countdown = null;
                     ninjapad.recorder.start();
-                    ninjapad.jQElement.recStatus.html(`
+                    ninjapad.elements.recStatus.html(`
                         <div style="font-size: 3vmin;">🔴</div>
                         <div>&nbsp;REC</div>
                     `);
@@ -462,7 +462,7 @@ ninjapad.menu = function() {
             },
 
             play: function() {
-                ninjapad.jQElement.recStatus.html(`
+                ninjapad.elements.recStatus.html(`
                     <div style="font-size: 5vmin; color: lime">▶</div>
                     <div>&nbsp;PLAY</div>
                 `);
@@ -477,7 +477,7 @@ ninjapad.menu = function() {
             },
 
             import: function() {
-                ninjapad.jQElement.uploadZIP.trigger("click");
+                ninjapad.elements.uploadZIP.trigger("click");
 
                 const inputElement = document.getElementById("uploadZIP");
                 inputElement.addEventListener("change", handleFiles, false);
@@ -557,12 +557,12 @@ ninjapad.menu = function() {
                     mode < 0 ? iRMode : mode
                 );
                 if (iRMode) {
-                    ninjapad.jQElement.recMenu.show();
-                    ninjapad.jQElement.recStatus.show();
+                    ninjapad.elements.recMenu.show();
+                    ninjapad.elements.recStatus.show();
                 }
                 else {
-                    ninjapad.jQElement.recMenu.hide();
-                    ninjapad.jQElement.recStatus.hide();
+                    ninjapad.elements.recMenu.hide();
+                    ninjapad.elements.recStatus.hide();
                 }
             }
         }
