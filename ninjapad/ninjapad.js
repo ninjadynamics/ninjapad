@@ -45,8 +45,11 @@ const ninjapad = {
 
     initialize: function() {
         ninjapad.elements = {
+            root:           $("#ninjaPad"),
+            screen:         $("#SCREEN"),
             gamepad:        $("#GAMEPAD"),
             gamepadButtons: $("#GAMEPAD-BUTTONS"),
+            actionButtons:  $("#ACTION"),
             analogSwitch:   $("#analogSwitch"),
             menu:           $("#menu"),
             uploadROM:      $("#uploadROM"),

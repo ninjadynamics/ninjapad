@@ -97,8 +97,8 @@ ninjapad.interface = {
             if (!window.AudioContext) {
                 return 44100;
             }
-            let myCtx = new window.AudioContext();
-            let sampleRate = myCtx.sampleRate;
+            var myCtx = new window.AudioContext();
+            var sampleRate = myCtx.sampleRate;
             myCtx.close();
             return sampleRate;
         }
@@ -340,8 +340,8 @@ ninjapad.interface = {
         // you need to provide the exact same keys
         return {
             display: {
-                width: 256,
-                height: 240
+                width: SCREEN_WIDTH,
+                height: SCREEN_HEIGHT
             },
 
             core: function() {

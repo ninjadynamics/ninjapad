@@ -118,7 +118,7 @@ ninjapad.utils = function() {
 
         assign: function(fn, elementName, ...touchEvents) {
             // Prevent default on all events
-            let element = document.getElementById(elementName);
+            var element = document.getElementById(elementName);
             for (const e of TOUCH_EVENTS) {
                 eval("element.ontouch" + e + " = ninjapad.utils.preventDefault");
             }
@@ -130,7 +130,7 @@ ninjapad.utils = function() {
 
         assignNoPropagation: function(fn, elementName, ...touchEvents) {
             // Prevent default and stop propagation on all events
-            let element = document.getElementById(elementName);
+            var element = document.getElementById(elementName);
             for (const e of TOUCH_EVENTS) {
                 eval("element.ontouch" + e + " = ninjapad.utils.preventDefaultWithoutPropagation");
             }
@@ -142,12 +142,12 @@ ninjapad.utils = function() {
 
         assignClick: function(fn, elementName) {
             // Prevent default on all events
-            let element = document.getElementById(elementName);
+            var element = document.getElementById(elementName);
             element.onclick = fn;
         },
 
         allowInteraction: function(elementName) {
-            let element = document.getElementById(elementName);
+            var element = document.getElementById(elementName);
             for (const e of TOUCH_EVENTS) {
                 eval("element.ontouch" + e + " = ninjapad.utils.stopPropagation");
             }
@@ -182,18 +182,18 @@ ninjapad.utils = function() {
         },
 
         vw: function(v) {
-            let w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+            var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
             return (v * w) / 100;
         },
 
         vh: function(v) {
-            let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+            var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
             return (v * h) / 100;
         },
 
         vmin: function(v) {
-            let w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-            let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+            var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+            var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
             return Math.min(
                 (v * w) / 100,
                 (v * h) / 100

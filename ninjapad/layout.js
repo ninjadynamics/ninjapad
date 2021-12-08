@@ -2,40 +2,45 @@
 // Creative Commons Attribution 4.0 International Public License
 
 ninjapad.layout = function() {
+
+    var elm;
+    var emuScrWidth;
+    var emuScrHeight;
+
     var coldStart = true;
 
     function setOSDLayout() {
 
-        // Cache screen size
-        const scrHeight = ninjapad.elements.emuScreen.height();
-        const scrWidth = ninjapad.elements.emuScreen.width();
+        // Cache emulation screen size
+        const scrHeight = elm.emuScreen.height();
+        const scrWidth = elm.emuScreen.width();
 
         // Setup menu screen
-        var osd = ninjapad.elements.osd;
-        ninjapad.elements.osd.empty();
-        ninjapad.elements.osd.detach().appendTo(ninjapad.elements.emuScreen);
-        ninjapad.elements.osd.css("top", 0);
-        ninjapad.elements.osd.css("left", 0);
-        ninjapad.elements.osd.css("height", scrHeight);
-        ninjapad.elements.osd.css("width", scrWidth);
-        ninjapad.elements.osd.css("visibility", ninjapad.pause.pauseScreen.visibility);
-        ninjapad.elements.osd.css("font-size", 0.05 * scrHeight);
-        ninjapad.elements.osd.css("word-spacing", "0.5em");
-        ninjapad.elements.osd.css("padding", "2em");
-        ninjapad.elements.osd.append(ninjapad.pause.pauseScreen.content);
+        var osd = elm.osd;
+        elm.osd.empty();
+        elm.osd.detach().appendTo(elm.emuScreen);
+        elm.osd.css("top", 0);
+        elm.osd.css("left", 0);
+        elm.osd.css("height", scrHeight);
+        elm.osd.css("width", scrWidth);
+        elm.osd.css("visibility", ninjapad.pause.pauseScreen.visibility);
+        elm.osd.css("font-size", 0.05 * scrHeight);
+        elm.osd.css("word-spacing", "0.5em");
+        elm.osd.css("padding", "2em");
+        elm.osd.append(ninjapad.pause.pauseScreen.content);
 
         // Setup input recorder menu
-        var offset = `${ninjapad.elements.emuScreen.width() * 0.06}px`;
-        ninjapad.elements.recMenu.css("right", offset);
-        ninjapad.elements.recMenu.css("bottom", offset);
-        ninjapad.elements.recMenu.css("font-size", 0.05 * scrHeight);
-        ninjapad.elements.recMenu.css("padding", "0.2em");
+        var offset = `${elm.emuScreen.width() * 0.06}px`;
+        elm.recMenu.css("right", offset);
+        elm.recMenu.css("bottom", offset);
+        elm.recMenu.css("font-size", 0.05 * scrHeight);
+        elm.recMenu.css("padding", "0.2em");
 
         // Setup input recorder status
-        ninjapad.elements.recStatus.css("left", offset);
-        ninjapad.elements.recStatus.css("bottom", offset);
-        ninjapad.elements.recStatus.css("font-size", 0.05 * scrHeight);
-        ninjapad.elements.recStatus.css("padding", "0.2em");
+        elm.recStatus.css("left", offset);
+        elm.recStatus.css("bottom", offset);
+        elm.recStatus.css("font-size", 0.05 * scrHeight);
+        elm.recStatus.css("padding", "0.2em");
 
         // Set visibility
         ninjapad.menu.inputRecorder.show();
@@ -44,11 +49,11 @@ ninjapad.layout = function() {
     }
 
     function setEmulationScreenLayout() {
-        ninjapad.elements.emuScreen.removeAttr("style");
-        ninjapad.elements.emuScreen.css("width", ninjapad.emulator.display.width);
-        ninjapad.elements.emuScreen.css("height", ninjapad.emulator.display.height);
-        ninjapad.elements.emuScreen.css("margin", "auto");
-        ninjapad.elements.emuScreen.css("position", "relative");
+        elm.emuScreen.removeAttr("style");
+        elm.emuScreen.css("width", ninjapad.emulator.display.width);
+        elm.emuScreen.css("height", ninjapad.emulator.display.height);
+        elm.emuScreen.css("margin", "auto");
+        elm.emuScreen.css("position", "relative");
     }
 
     function setDesktopLayout() {
@@ -59,22 +64,22 @@ ninjapad.layout = function() {
         var height = useJQuery ? $(window).height() : window.innerHeight;
 
         if (width > height) {
-            ninjapad.elements.emuScreen.height("100%");
-            var newHeight = ninjapad.elements.emuScreen.height();
-            ninjapad.elements.emuScreen.width(256 * (newHeight / 240));
+            elm.emuScreen.height("100%");
+            var newHeight = elm.emuScreen.height();
+            elm.emuScreen.width(emuScrWidth * (newHeight / emuScrHeight));
         }
         else {
-            ninjapad.elements.emuScreen.width("100%");
-            var newWidth = ninjapad.elements.emuScreen.width();
-            ninjapad.elements.emuScreen.height(240 * (newWidth / 256));
+            elm.emuScreen.width("100%");
+            var newWidth = elm.emuScreen.width();
+            elm.emuScreen.height(emuScrHeight * (newWidth / emuScrWidth));
         }
-        ninjapad.elements.gamepad.height("0%");
-        ninjapad.elements.gamepadButtons.hide();
+        elm.gamepad.height("0%");
+        elm.gamepadButtons.hide();
 
-        $("#REC_MENU").detach().appendTo(ninjapad.elements.emuScreen);
-        $("#REC_STATUS").detach().appendTo(ninjapad.elements.emuScreen);
-        var fontSize = `${ninjapad.elements.emuScreen.width() * 0.05}px`;
-        ninjapad.elements.osd.css("font-size", fontSize);
+        $("#REC_MENU").detach().appendTo(elm.emuScreen);
+        $("#REC_STATUS").detach().appendTo(elm.emuScreen);
+        var fontSize = `${elm.emuScreen.width() * 0.05}px`;
+        elm.osd.css("font-size", fontSize);
     }
 
     function setMobileLayout() {
@@ -82,12 +87,12 @@ ninjapad.layout = function() {
 
         if (coldStart) {
             DEBUG && console.log("NinjaPad: Mobile mode: Cold start");
-            $("#ninjaPad").css("height", "100%");
+            elm.root.css("height", "100%");
             $("body").removeAttr("style").css("margin", "0%");
             setEmulationScreenLayout();
-            ninjapad.elements.emuScreen.detach().appendTo("#SCREEN");
-            $("#REC_MENU").detach().appendTo(ninjapad.elements.emuScreen);
-            $("#REC_STATUS").detach().appendTo(ninjapad.elements.emuScreen);
+            elm.emuScreen.detach().appendTo("#SCREEN");
+            elm.recMenu.detach().appendTo(elm.emuScreen);
+            elm.recStatus.detach().appendTo(elm.emuScreen);
             $("body *").not("#ninjaPad *").not("#ninjaPad").remove();
             coldStart = false;
         }
@@ -96,52 +101,54 @@ ninjapad.layout = function() {
         var width = useJQuery ? $(window).width() : window.innerWidth;
         var height = useJQuery ? $(window).height() : window.innerHeight;
 
+        const functionalLeft = $("#FUNCTIONAL-BL");
+        const functionalRight = $("#FUNCTIONAL-TR");
+
         if (height >= width || window.matchMedia("(orientation: portrait)").matches) {
 
-            $("#SCREEN").detach().appendTo("#ninjaPad");
-            $("#GAMEPAD").detach().appendTo("#ninjaPad");
+            elm.screen.detach().appendTo("#ninjaPad");
+            elm.gamepad.detach().appendTo("#ninjaPad");
 
-            $("#GAMEPAD").removeAttr("style");
+            elm.gamepad.removeAttr("style");
 
-            var dPadState = $("#DPAD").css("display");
-            $("#DPAD").removeAttr("style").css("display", dPadState);
+            var dPadState = elm.dpad.css("display");
+            elm.dpad.removeAttr("style").css("display", dPadState);
 
-            var analogState = $("#ANALOG").css("display");
-            $("#ANALOG").removeAttr("style").css("display", analogState);
+            var analogState = elm.analog.css("display");
+            elm.analog.removeAttr("style").css("display", analogState);
 
-            $("#ACTION").removeAttr("style");
+            elm.actionButtons.removeAttr("style");
 
-            $("#FUNCTIONAL-TR").removeAttr("style");
-            $("#FUNCTIONAL-BL").removeAttr("style");
+            functionalLeft.removeAttr("style");
+            functionalRight.removeAttr("style");
 
             $("#BUTTON_SELECT").css("top", "").detach().appendTo("#FUNCTIONAL-TR");
             $("#BUTTON_START").css("top", "").detach().appendTo("#FUNCTIONAL-BL");
 
-            $("#analogSwitch").css("top", "").detach().appendTo("#FUNCTIONAL-TR");
-            $("#menu").css("top", "").detach().appendTo("#FUNCTIONAL-BL");
+            elm.analogSwitch.css("top", "").detach().appendTo("#FUNCTIONAL-TR");
+            elm.menu.css("top", "").detach().appendTo("#FUNCTIONAL-BL");
 
             var opacity = 1;
             var bottom = "auto";
 
-            ninjapad.elements.emuScreen.width(window.innerWidth);
-            //ninjapad.elements.emuScreen.css("top", "0vh");
-            var newWidth = ninjapad.elements.emuScreen.width();
-            ninjapad.elements.emuScreen.height(240 * (newWidth / 256));
+            elm.emuScreen.width(window.innerWidth);
+            var newWidth = elm.emuScreen.width();
+            elm.emuScreen.height(emuScrHeight * (newWidth / emuScrWidth));
 
             var padHeight = ninjapad.utils.vw(47.5);
-            var remainingHeight = height - ninjapad.elements.emuScreen.height();
-            ninjapad.elements.gamepad.height(Math.max(padHeight, remainingHeight));
+            var remainingHeight = height - elm.emuScreen.height();
+            elm.gamepad.height(Math.max(padHeight, remainingHeight));
 
             var difference = remainingHeight - padHeight;
             if (difference < 0) {
                 opacity += (difference / (padHeight * 2));
                 bottom = 0;
             }
-            ninjapad.elements.gamepad.css("bottom", bottom);
-            ninjapad.elements.gamepad.css("display", "block");
+            elm.gamepad.css("bottom", bottom);
+            elm.gamepad.css("display", "block");
 
-            ninjapad.elements.gamepadButtons.css("opacity", opacity);
-            ninjapad.elements.gamepadButtons.show();
+            elm.gamepadButtons.css("opacity", opacity);
+            elm.gamepadButtons.show();
 
             if (ninjapad.pause.state.cannotResume) {
                 ninjapad.pause.state.cannotResume = false;
@@ -150,91 +157,86 @@ ninjapad.layout = function() {
             DEBUG && console.log("NinjaPad: Touch controls enabled");
         }
         else {
-
-            // var maxHeight = ninjapad.utils.isIOSDevice() ?
-            //     window.innerHeight : "100%";
-
             // Display the GAMEPAD element and set the height to 100%
-            ninjapad.elements.gamepad.css("display", "block");
-            ninjapad.elements.gamepad.css("height", window.innerHeight);
+            elm.gamepad.css("display", "block");
+            elm.gamepad.css("height", window.innerHeight);
 
             // Nest the SCREEN element on the GAMEPAD element
-            $("#SCREEN").detach().appendTo("#GAMEPAD");
+            elm.screen.detach().appendTo("#GAMEPAD");
 
             // Set the EMULATION_SCREEN element height to 100%
-            ninjapad.elements.emuScreen.height("100%"); //("90%");
-            var newHeight = ninjapad.elements.emuScreen.height();
-            ninjapad.elements.emuScreen.width(256 * (newHeight / 240));
+            elm.emuScreen.height("100%"); //("90%");
+            var newHeight = elm.emuScreen.height();
+            elm.emuScreen.width(emuScrWidth * (newHeight / emuScrHeight));
 
             // Center the SCREEN element vertically
-            ninjapad.elements.gamepad.css("display", "flex");
+            elm.gamepad.css("display", "flex");
 
             // Get the width of the empty sides
-            var w = ((width - ninjapad.elements.emuScreen.width()) / 2);
+            var w = ((width - elm.emuScreen.width()) / 2);
 
             // Calculate the maximum size for the button areas
             var s = 0.85 * Math.min(w, ninjapad.utils.vmin(55));
             var o = (w / 2) - (s / 2); // Offset
 
-            $("#DPAD").css("top", "auto");
-            $("#DPAD").css("bottom", "45%");
-            $("#DPAD").css("left", o);
-            $("#DPAD").css("width", s);
-            $("#DPAD").css("height", s);
+            // Modify DPAD size and position
+            elm.dpad.css("top", "auto");
+            elm.dpad.css("bottom", "45%");
+            elm.dpad.css("left", o);
+            elm.dpad.css("width", s);
+            elm.dpad.css("height", s);
 
-            $("#ANALOG").css("top", "auto");
-            $("#ANALOG").css("bottom", "45%");
-            $("#ANALOG").css("left", o);
-            $("#ANALOG").css("width", s);
-            $("#ANALOG").css("height", s);
+            // Modify ANALOG size and position
+            elm.analog.css("top", "auto");
+            elm.analog.css("bottom", "45%");
+            elm.analog.css("left", o);
+            elm.analog.css("width", s);
+            elm.analog.css("height", s);
 
-            $("#ACTION").css("top", "auto");
-            $("#ACTION").css("bottom", "45%");
-            $("#ACTION").css("right", o);
-            $("#ACTION").css("width", s);
-            $("#ACTION").css("height", s);
+            // Modify ACTION BUTTONS size and position
+            elm.actionButtons.css("top", "auto");
+            elm.actionButtons.css("bottom", "45%");
+            elm.actionButtons.css("right", o);
+            elm.actionButtons.css("width", s);
+            elm.actionButtons.css("height", s);
 
-            // - - - - - - - - - - - - - - - - - - -
-
-            var bSel = $("#BUTTON_SELECT").detach();
-            var bStr = $("#BUTTON_START").detach();
-
-            var bAnl = $("#analogSwitch").detach();
-            var bMen = $("#menu").detach();
-
-            var functionalLeft = $("#FUNCTIONAL-BL");
-            var functionalRight = $("#FUNCTIONAL-TR");
-
+            // Modify the FUNCTIONAL button's parent elements
+            const bSel = $("#BUTTON_SELECT").detach();
+            const bStr = $("#BUTTON_START").detach();
+            const bAnl = $("#analogSwitch").detach();
+            const bMen = $("#menu").detach();
             bSel.appendTo(functionalLeft);
             bStr.appendTo(functionalRight);
-
             bAnl.appendTo(functionalLeft);
             bMen.appendTo(functionalRight);
 
-            var fw = s / 3;
-            var fh = functionalLeft.height() * (fw / functionalLeft.width());
+            // Calculate the L/R offset for FUNCTIONAL buttons
+            const fw = s / 3;
+            const fh = functionalLeft.height() * (fw / functionalLeft.width());
             o = (w / 2) - (fw / 2);
 
+            // Modify L FUNCTIONAL size and position
             functionalLeft.css("width", fw);
             functionalLeft.css("height", fh);
             functionalLeft.css("top", "65%");
             functionalLeft.css("left", o);
             functionalLeft.css("right", "auto");
 
+            // Modify R FUNCTIONAL size and position
             functionalRight.css("width", fw);
             functionalRight.css("height", fh);
             functionalRight.css("top", "65%");
             functionalRight.css("left", "auto");
             functionalRight.css("right", o);
 
+            // Re-arrange FUNCTIONAL button positions
             bStr.css("top", bAnl.css("top"));
             bMen.css("top", bSel.css("top"));
-
             bSel.css("top", bAnl.css("top"));
             bAnl.css("top", bMen.css("top"));
 
             // Show buttons
-            ninjapad.elements.gamepadButtons.show();
+            elm.gamepadButtons.show();
 
             DEBUG && console.log("NinjaPad: Touch controls disabled");
         }
@@ -254,10 +256,17 @@ ninjapad.layout = function() {
         );
     }
 
+    function loadVars() {
+        elm = ninjapad.elements;
+        emuScrWidth = ninjapad.emulator.display.width;
+        emuScrHeight = ninjapad.emulator.display.height;
+    }
+
     return {
         setPageLayout: function() {
+            loadVars();
             ninjapad.utils.isMobileDevice() ? setMobileLayout() : setDesktopLayout();
-            ninjapad.layout.analogStickMovementRadius = $("#ANALOG").width() / 4;
+            ninjapad.layout.analogStickMovementRadius = elm.analog.width() / 4;
             setOSDLayout();
         },
 

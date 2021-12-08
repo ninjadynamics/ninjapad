@@ -11,8 +11,8 @@ ninjapad.pause = function() {
 
     function pauseText(content, resumable) {
         if (!content) {
-            let msg = "Emulation paused";
-            let resumeMsg = ninjapad.utils.isMobileDevice() ? "Tap" : "Click";
+            var msg = "Emulation paused";
+            var resumeMsg = ninjapad.utils.isMobileDevice() ? "Tap" : "Click";
             resumeMsg += " to resume";
             content = "<span>" + msg + "<br/>" + resumeMsg + "</span>";
             resumable = true;

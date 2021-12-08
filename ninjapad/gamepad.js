@@ -89,19 +89,19 @@ ninjapad.gamepad = function() {
                         analog.deltaX = touch.clientX - analog.touchX;
                         analog.deltaY = touch.clientY - analog.touchY;
 
-                        let r = ninjapad.utils.angle(analog.deltaX, analog.deltaY);
-                        let d = Math.min(
+                        var r = ninjapad.utils.angle(analog.deltaX, analog.deltaY);
+                        var d = Math.min(
                             ninjapad.layout.analogStickMovementRadius,
                             ninjapad.utils.dist(analog.deltaX, analog.deltaY)
                         );
 
-                        let dx = Math.cos(r) * d;
-                        let dy = Math.sin(r) * d;
+                        var dx = Math.cos(r) * d;
+                        var dy = Math.sin(r) * d;
                         ninjapad.elements.analogStick.css(
                             "transform",
                             "translate(" + dx + "px, " + dy + "px)"
                         );
-                        let btnIndex = Math.floor(((180 + (45/2) + (r * 180 / Math.PI)) % 360) / 45);
+                        var btnIndex = Math.floor(((180 + (45/2) + (r * 180 / Math.PI)) % 360) / 45);
                         analog.padBtn && pressButtons(ninjapad.emulator.buttonUp, analog.padBtn);
                         analog.padBtn = d < ninjapad.utils.vmin(DEADZONE) ? null : DPAD_BUTTONS[btnIndex];
                         analog.padBtn && pressButtons(ninjapad.emulator.buttonDown, analog.padBtn);
@@ -132,7 +132,7 @@ ninjapad.gamepad = function() {
 
                 // Get the element (either a button or the empty area of the gamepad)
                 // the user is physically touching right now
-                let element = $(document.elementFromPoint(touch.clientX, touch.clientY))[0];
+                var element = $(document.elementFromPoint(touch.clientX, touch.clientY))[0];
 
                 // If it's a new touch, set the child button to its parent
                 if (event.type == "touchstart") {
@@ -143,7 +143,7 @@ ninjapad.gamepad = function() {
                 else if (childButton[target.id].id != element.id) {
                 //else if (element.id && childButton[target.id].id != element.id) {
                     // Check which button (if any) the user had its finger on previously
-                    let lastButton = childButton[target.id];
+                    var lastButton = childButton[target.id];
                     // If the user was actually pressing a button before
                     if (lastButton.id.startsWith("BUTTON")) {
                         // Tell the emulator to release that button
@@ -155,7 +155,7 @@ ninjapad.gamepad = function() {
                     // Otherwise, if it was a multipress
                     else if (lastButton.id.startsWith("MULTI")) {
                         // Get buttons
-                        let key = lastButton.id.split("_").pop();
+                        var key = lastButton.id.split("_").pop();
                         for (const btn of MULTIPRESS[key]) {
                             if (buttonPresses[btn] == RELEASED) continue;
                             // - - - - - - - - - - - - - - - - - - - -
@@ -177,8 +177,8 @@ ninjapad.gamepad = function() {
                 }
 
                 // If the user is interacting with a single button
-                let isPressed = isButtonDown(event.type);
-                let interactWith = fnButtonPress(event.type);
+                var isPressed = isButtonDown(event.type);
+                var interactWith = fnButtonPress(event.type);
                 if (element.id.startsWith("BUTTON")) {
                     // Press / release that button
                     if (buttonPresses[element.id] != isPressed) {
@@ -190,7 +190,7 @@ ninjapad.gamepad = function() {
                 // to two buttons at the same time
                 else if (element.id.startsWith("MULTI")) {
                     // Get buttons and press / release them
-                    let key = element.id.split("_").pop();
+                    var key = element.id.split("_").pop();
                     for (const btn of MULTIPRESS[key]) {
                         if (buttonPresses[btn] == isPressed) continue;
                         // - - - - - - - - - - - - - - - - - - - - - -
@@ -250,7 +250,7 @@ ninjapad.gamepad = function() {
         // Doesn't work on iOS
         toggleFullScreen: function(event) {
             event.preventDefault();
-            let element = document.getElementById("ninjaPad");
+            var element = document.getElementById("ninjaPad");
             ninjapad.utils.isFullScreen() ?
             ninjapad.utils.exitFullScreen() :
             ninjapad.utils.enterFullscreen(element);
