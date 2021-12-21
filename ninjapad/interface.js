@@ -178,13 +178,13 @@ ninjapad.interface = {
         }
 
         function nes_load_url(canvas_id, path, callback, ...args) {
-            nes_init(canvas_id);
             var req = new XMLHttpRequest();
             req.open("GET", path);
             req.overrideMimeType("text/plain; charset=x-user-defined");
-            req.onerror = () => console.log(`Error loading ${path}: ${req.statusText}`);
+            req.onerror = () => console.log(`Error loading ${path}`);
             req.onload = function() {
-                if (this.status === 200) {
+                if (this.status === 200 && this.response.startsWith("NES")) {
+                    nes_init(canvas_id);
                     nes_boot(this.responseText);
                     DEBUG && console.log(
                         `NinjaPad: ROM loaded [${
@@ -450,7 +450,10 @@ ninjapad.interface = {
             },
 
             initialize: function(callback, ...args) {
-                nes_load_url(EMULATION_DISPLAY, DEFAULT_ROM, callback, ...args);
+                var expr = /^\?rom=(.*\.nes)/;
+                var url = expr.exec(window.location.search);
+                url = url ? "roms/" + url.pop() : DEFAULT_ROM;
+                nes_load_url(EMULATION_DISPLAY, url, callback, ...args);
             }
         };
     }()

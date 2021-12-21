@@ -1,4 +1,4 @@
-# NinjaPad v1.2.2
+# NinjaPad v1.2.3
 NinjaPad is a retro emulation interface for both desktop and mobile.  
 Originally meant for the JSNES emulator, NinjaPad is designed in a developer
 friendly way, allowing for anyone to expand its capabilities.  
