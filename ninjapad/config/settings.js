@@ -5,7 +5,7 @@ const DEBUG = true;
 const DEADZONE = 2; // vmin
 
 // Face buttons angle
-const GAMEBOY_LAYOUT = false;
+const GAMEBOY_LAYOUT = true;
 
 // Emulation screen
 const EMULATION_SCREEN = "emu-screen";
