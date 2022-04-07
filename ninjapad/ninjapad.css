@@ -245,6 +245,42 @@
     background-color: rgba(255, 255, 255, 0.03);
 }
 
+.button_Ax {
+    position: absolute;
+    right: 0%;
+    bottom: -2.5%;
+    width: 50%;
+    height: 50%;
+    box-sizing: border-box;
+    border-radius: 50%;
+
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+    font-family: monospace;
+}
+
+.button_ABx {
+    position: absolute;
+    right: 0%;
+    top: -2.5%;
+    width: 50%;
+    height: 50%;
+    box-sizing: border-box;
+    border-radius: 50%;
+
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+    font-family: monospace;
+
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
 .button_SELECT {
     position: absolute;
     left: 0%;
