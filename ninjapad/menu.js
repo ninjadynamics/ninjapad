@@ -397,6 +397,14 @@ ninjapad.menu = function() {
             closeMenuAndResumeEmulation();
         },
 
+        reload: function() {
+            if (isOpen) {
+                var color_on = ninjapad.utils.getCSSVar("#menu", "color_on");
+                ninjapad.utils.changeButtonColor("#menu", color_on, glow=true);
+                openMenu(mainMenu, closeMenuAndResumeEmulation);
+            }
+        },
+
         toggle: {
             mainMenu: function() {
                 if (isOpen) {

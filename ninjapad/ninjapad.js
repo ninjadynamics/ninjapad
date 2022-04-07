@@ -127,6 +127,7 @@ $(document).ready(async function() {
     $(window).resize(function() {
         ninjapad.autosave();
         ninjapad.initialize();
+        ninjapad.menu.reload();
     });
 
     // Use ESC key to open the menu
