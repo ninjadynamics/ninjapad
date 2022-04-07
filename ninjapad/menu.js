@@ -69,6 +69,10 @@ ninjapad.menu = function() {
                 `Input recorder ${inColor("lime", iRModes[iRMode])}`,
                 js=`ninjapad.menu.inputRecorder.selectMode(); ninjapad.menu.show.optionsMenu()`,
                 hide=!INPUT_RECORDER
+            ),
+            ninjapad.utils.link(
+                "Toggle button layout",
+                js="ninjapad.layout.toggleABLayout()"
             )
         );
     }
@@ -391,6 +395,14 @@ ninjapad.menu = function() {
 
         close: function() {
             closeMenuAndResumeEmulation();
+        },
+
+        reload: function() {
+            if (isOpen) {
+                var color_on = ninjapad.utils.getCSSVar("#menu", "color_on");
+                ninjapad.utils.changeButtonColor("#menu", color_on, glow=true);
+                openMenu(mainMenu, closeMenuAndResumeEmulation);
+            }
         },
 
         toggle: {
