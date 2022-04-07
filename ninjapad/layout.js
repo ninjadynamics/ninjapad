@@ -82,21 +82,18 @@ ninjapad.layout = function() {
         elm.osd.css("font-size", fontSize);
     }
 
-    function toggleABLayout() {
-        if (isGBLayout) {
-            isGBLayout = false;
-            const btnTop = $(".button_AB").css("top");
-            const btnBtm = $(".button_A").css("bottom");
-            $(".button_A").css("bottom", "auto").css("top", btnTop);
-            $(".button_AB").css("top", "auto").css("bottom", btnBtm);
+    function setABLayout(toggle=false) {
+        if (toggle) {
+            isGBLayout = !isGBLayout;
         }
-        else {
-            isGBLayout = true;
-            const btnTop = $(".button_A").css("top");
-            const btnBtm = $(".button_AB").css("bottom");
-            $(".button_A").css("top", "auto").css("bottom", btnBtm);
-            $(".button_AB").css("bottom", "auto").css("top", btnTop);
-        }
+        const rem = "x".repeat(isGBLayout);
+        const add = "x".repeat(!isGBLayout);
+        $("#BUTTON_A")
+            .removeClass("button_A" + rem)
+            .addClass("button_A" + add);
+        $("#MULTI_AB")
+            .removeClass("button_AB" + rem)
+            .addClass("button_AB" + add);
     }
 
     function setMobileLayout() {
@@ -114,6 +111,8 @@ ninjapad.layout = function() {
             isGBLayout = GAMEBOY_LAYOUT;
             coldStart = false;
         }
+
+        setABLayout();
 
         var useJQuery = !ninjapad.utils.isFullScreen() || ninjapad.utils.isIOSDevice();
         var width = useJQuery ? $(window).width() : window.innerWidth;
@@ -258,8 +257,6 @@ ninjapad.layout = function() {
 
             DEBUG && console.log("NinjaPad: Touch controls disabled");
         }
-
-        if (!isGBLayout) toggleABLayout();
     }
 
     function handleLandscapeMode() {
@@ -284,7 +281,7 @@ ninjapad.layout = function() {
 
     return {
         toggleABLayout: function() {
-            toggleABLayout();
+            setABLayout(true);
         },
 
         setPageLayout: function() {
