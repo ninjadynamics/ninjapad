@@ -166,6 +166,7 @@ ninjapad.menu = function() {
         var color_off = ninjapad.utils.getCSSVar("#menu", "color");
         ninjapad.utils.changeButtonColor("#menu", color_off);
         ninjapad.pause.state.isEmulationPaused && ninjapad.pause.resumeEmulation();
+        clearInterval(countdown); countdown = null;
         fnESC = null; fnESCArgs = [];
         isOpen = false;
         return true;
@@ -409,8 +410,6 @@ ninjapad.menu = function() {
             mainMenu: function() {
                 if (isOpen) {
                     closeMenuAndResumeEmulation();
-                    clearInterval(countdown);
-                    countdown = null;
                     return;
                 }
                 // ninjapad.autosave(); -- TODO: Use web worker instead
