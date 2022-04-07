@@ -82,17 +82,16 @@ ninjapad.layout = function() {
         elm.osd.css("font-size", fontSize);
     }
 
-    function setABLayout(toggle=false) {
-        if (toggle) {
-            isGBLayout = !isGBLayout;
-        }
+    function toggleABLayout() {
         if (isGBLayout) {
+            isGBLayout = false;
             const btnTop = $(".button_AB").css("top");
             const btnBtm = $(".button_A").css("bottom");
             $(".button_A").css("bottom", "auto").css("top", btnTop);
             $(".button_AB").css("top", "auto").css("bottom", btnBtm);
         }
         else {
+            isGBLayout = true;
             const btnTop = $(".button_A").css("top");
             const btnBtm = $(".button_AB").css("bottom");
             $(".button_A").css("top", "auto").css("bottom", btnBtm);
@@ -122,8 +121,6 @@ ninjapad.layout = function() {
 
         const functionalLeft = $("#FUNCTIONAL-BL");
         const functionalRight = $("#FUNCTIONAL-TR");
-
-        setABLayout();
 
         if (height >= width || window.matchMedia("(orientation: portrait)").matches) {
 
@@ -261,6 +258,8 @@ ninjapad.layout = function() {
 
             DEBUG && console.log("NinjaPad: Touch controls disabled");
         }
+
+        if (!isGBLayout) toggleABLayout();
     }
 
     function handleLandscapeMode() {
@@ -285,7 +284,7 @@ ninjapad.layout = function() {
 
     return {
         toggleABLayout: function() {
-            setABLayout(true);
+            toggleABLayout();
         },
 
         setPageLayout: function() {
