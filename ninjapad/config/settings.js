@@ -4,6 +4,9 @@ const DEBUG = true;
 // Virtual analog deadzone
 const DEADZONE = 2; // vmin
 
+// Face buttons angle
+const GAMEBOY_LAYOUT = false;
+
 // Emulation screen
 const EMULATION_SCREEN = "emu-screen";
 const EMULATION_DISPLAY = "emu-canvas";

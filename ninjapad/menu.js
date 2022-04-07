@@ -69,6 +69,10 @@ ninjapad.menu = function() {
                 `Input recorder ${inColor("lime", iRModes[iRMode])}`,
                 js=`ninjapad.menu.inputRecorder.selectMode(); ninjapad.menu.show.optionsMenu()`,
                 hide=!INPUT_RECORDER
+            ),
+            ninjapad.utils.link(
+                "Toggle button layout",
+                js="ninjapad.layout.toggleABLayout()"
             )
         );
     }
