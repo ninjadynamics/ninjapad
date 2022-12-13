@@ -138,7 +138,14 @@ ninjapad.interface = {
             var id = event.keyCode;
             var button = keyboardMappings[event.keyCode];
             var isPressed = callback == buttonDown;
-            if (isPressed && kbButtonPresses[id]) return;
+            if (isPressed && kbButtonPresses[id])
+            {
+                // The button is already active so don't trigger callback() however,
+                // it should still be "captured" by this app so that things like holding
+                // arrow keys don't trigger the brower to scroll.
+                event.preventDefault();
+                return;
+            }
             if (typeof(button) === "undefined") return;
             callback(button);
             kbButtonPresses[id] = isPressed;
