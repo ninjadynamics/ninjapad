@@ -24,7 +24,5 @@ The file '**ninjapad/interface.js**' allows you to create new interfaces for dif
 Use the existing **jsnes** interface as a template to create your own.  
 
 ## License
-**Creative Commons Attribution 4.0 International Public License**  
-- You can do whatever you want with this project, fork it, modify it, expand it, just give me credit for it.  
-
-## Enjoy!
+**Creative Commons Attribution 4.0 International Public License**
+- Attribution is appreciated, but it's alright if you don't.
