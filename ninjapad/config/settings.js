@@ -14,6 +14,7 @@ const EMULATION_DISPLAY = "emu-canvas";
 // Emulation settings
 const SYSTEM = "nes";
 const EMULATOR = "jsnes";
+// const EMULATOR = "binjnes";
 const DEFAULT_ROM = "roms/logo.nes";
 
 // User experience

@@ -112,7 +112,7 @@ $(document).ready(async function() {
     await ninjapad.boot();
 
     // Load the emulator
-    ninjapad.emulator = ninjapad.interface[EMULATOR];
+    ninjapad.emulator = await ninjapad.interface[EMULATOR]();
 
     // Pause on loss of focus
     $(window).blur(
