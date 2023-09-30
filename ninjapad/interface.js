@@ -1,4 +1,6 @@
 ninjapad.interface = {
+
+    // JSNES INTERFACE
     jsnes: function() {
         // This code is a modified port of the JSNES example:
         // https://github.com/bfirsh/jsnes/tree/master/example
@@ -463,5 +465,622 @@ ninjapad.interface = {
                 nes_load_url(EMULATION_DISPLAY, url, callback, ...args);
             }
         };
-    }()
+    },
+
+    // BINJNES INTERFACE
+    binjnes: async function() {
+        // This code is a modified port of the binjnes example:
+        // https://github.com/binji/binjnes/tree/main/docs/simple.js
+        "use strict";
+
+        const SCREEN_WIDTH = 256;
+        const SCREEN_HEIGHT = 240;
+        const AUDIO_FRAMES = 4096;
+        const AUDIO_LATENCY_SEC = 0.1;
+        const MAX_UPDATE_SEC = 5 / 60;
+        const PPU_TICKS_PER_SECOND = 5369318;
+        const EVENT_NEW_FRAME = 1;
+        const EVENT_AUDIO_BUFFER_FULL = 2;
+        const EVENT_UNTIL_TICKS = 4;
+
+        // From FrakenGraphics, based on FBX Smooth:
+        // https://www.patreon.com/posts/nes-palette-for-47391225
+        const NESPAL = [
+            0xff616161, 0xff880000, 0xff990d1f, 0xff791337, 0xff601256,
+            0xff10005d, 0xff000e52, 0xff08233a, 0xff0c3521, 0xff0e410d,
+            0xff174417, 0xff1f3a00, 0xff572f00, 0xff000000, 0xff000000,
+            0xff000000, 0xffaaaaaa, 0xffc44d0d, 0xffde244b, 0xffcf1269,
+            0xffad1490, 0xff481c9d, 0xff043492, 0xff055073, 0xff13695d,
+            0xff117a16, 0xff088013, 0xff497612, 0xff91661c, 0xff000000,
+            0xff000000, 0xff000000, 0xfffcfcfc, 0xfffc9a63, 0xfffc7e8a,
+            0xfffc6ab0, 0xfff26ddd, 0xffab71e7, 0xff5886e3, 0xff229ecc,
+            0xff00b1a8, 0xff00c172, 0xff4ecd5a, 0xff8ec234, 0xffcebe4f,
+            0xff424242, 0xff000000, 0xff000000, 0xfffcfcfc, 0xfffcd4be,
+            0xfffccaca, 0xfffcc4d9, 0xfffcc1ec, 0xffe7c3fa, 0xffc3cef7,
+            0xffa7cde2, 0xff9cdbda, 0xff9ee3c8, 0xffb8e5bf, 0xffc8ebb2,
+            0xffebe5b7, 0xffacacac, 0xff000000, 0xff000000,
+        ];
+
+        // TODO: copied from definitions in jsnes interface, find a way to share
+        const controllerMappings = {  // DualShock 4
+            12: "BUTTON_UP",        // DPAD Up
+            13: "BUTTON_DOWN",      // DPAD Down
+            14: "BUTTON_LEFT",      // DPAD Left
+            15: "BUTTON_RIGHT",     // DPAD Right
+             0: "BUTTON_A",         // Cross
+             2: "BUTTON_B",         // Square
+             8: "BUTTON_SELECT",    // Share
+             9: "BUTTON_START"      // Options
+        }
+
+        const keyboardMappings = {
+            38: "BUTTON_UP",        // Up
+            87: "BUTTON_UP",        // W
+            40: "BUTTON_DOWN",      // Down
+            83: "BUTTON_DOWN",      // S
+            37: "BUTTON_LEFT",      // Left
+            65: "BUTTON_LEFT",      // A
+            39: "BUTTON_RIGHT",     // Right
+            68: "BUTTON_RIGHT",     // D
+            18: "BUTTON_A",         // Alt
+            88: "BUTTON_A",         // X
+            17: "BUTTON_B",         // Ctrl
+            90: "BUTTON_B",         // Z
+            32: "BUTTON_SELECT",    // Space
+            16: "BUTTON_SELECT",    // Right Shift
+            13: "BUTTON_START"      // Enter
+        }
+
+        let nes = null;
+        let frameCounter = 0;
+
+        let gpButtonPresses = {
+            "BUTTON_UP": false,
+            "BUTTON_DOWN": false,
+            "BUTTON_LEFT": false,
+            "BUTTON_RIGHT": false,
+            "BUTTON_A": false,
+            "BUTTON_B": false,
+            "BUTTON_SELECT": false,
+            "BUTTON_START": false
+        };
+
+        let kbButtonPresses = {
+            "BUTTON_UP": false,
+            "BUTTON_DOWN": false,
+            "BUTTON_LEFT": false,
+            "BUTTON_RIGHT": false,
+            "BUTTON_A": false,
+            "BUTTON_B": false,
+            "BUTTON_SELECT": false,
+            "BUTTON_START": false
+        };
+
+        const binjnes = await Binjnes();
+
+        function resumeAudio() { if (nes) nes.audio.resume(); }
+        document.addEventListener('touchstart', resumeAudio);
+        document.addEventListener('keydown',    resumeAudio);
+
+        function makeWasmBuffer(ptr, size) {
+            return new Uint8Array(binjnes.HEAP8.buffer, ptr, size);
+        }
+
+        class BinjnesEmulator {
+            static start(romBuffer) {
+                BinjnesEmulator.stop();
+                nes = new BinjnesEmulator(romBuffer);
+                nes.run();
+            }
+
+            static stop() {
+                if (nes) {
+                    nes.destroy();
+                    nes = null;
+                }
+            }
+
+            constructor(romBuffer) {
+                this.romData = romBuffer;
+                this.romDataPtr = binjnes._malloc(romBuffer.byteLength);
+                let buf = makeWasmBuffer(this.romDataPtr, romBuffer.byteLength);
+                buf.set(new Uint8Array(romBuffer));
+                this.e = binjnes._emulator_new_simple(
+                    this.romDataPtr, romBuffer.byteLength, Audio.ctx.sampleRate,
+                    AUDIO_FRAMES);
+                if (this.e == 0) {
+                    throw new Error('Invalid ROM.');
+                }
+
+                this.audio = new Audio(this.e);
+                this.video = new Video(this.e);
+                this.joypadPtr = binjnes._joypad_new_simple(this.e);
+                this.lastRafSec = 0;
+                this.leftoverTicks = 0;
+                this.bindKeys();
+                this.bindGamepads();
+            }
+
+            loadState(u8a) {
+                let dataPtr = binjnes._malloc(u8a.length);
+                let buf = makeWasmBuffer(dataPtr, u8a.length);
+                buf.set(u8a);
+                let fileDataPtr = binjnes._state_file_data_new();
+                binjnes._set_file_data_ptr(fileDataPtr, dataPtr);
+                binjnes._set_file_data_size(u8a.length);
+                binjnes._emulator_read_state(this.e, fileDataPtr);
+                binjnes._file_data_delete2(fileDataPtr);
+            }
+
+            saveState() {
+                let fileDataPtr = binjnes._state_file_data_new();
+                binjnes._emulator_write_state(this.e, fileDataPtr);
+                let buf = makeWasmBuffer(
+                    binjnes._get_file_data_ptr(fileDataPtr),
+                    binjnes._get_file_data_size(fileDataPtr)).slice();
+                binjnes._file_data_delete2(fileDataPtr);
+                return buf;
+            }
+
+            getROMHash() {
+                return sha1(this.romData);
+            }
+
+            destroy() {
+                this.unbindGamepads();
+                this.unbindKeys();
+                this.cancelAnimationFrame();
+                binjnes._joypad_delete(this.joypadPtr);
+                binjnes._emulator_delete(this.e);
+                binjnes._free(this.romDataPtr);
+            }
+
+            withNewFileData(cb) {
+                const buffer = makeWasmBuffer(
+                    binjnes._get_file_data_ptr(fileDataPtr),
+                    binjnes._get_file_data_size(fileDataPtr));
+                const result = cb(fileDataPtr, buffer);
+                binjnes._file_data_delete(fileDataPtr);
+                return result;
+            }
+
+            get isPaused() {
+                return this.rafCancelToken === null;
+            }
+
+            pause() {
+                if (!this.isPaused) {
+                    this.cancelAnimationFrame();
+                    this.audio.pause();
+                }
+            }
+
+            resume() {
+                if (this.isPaused) {
+                    this.requestAnimationFrame();
+                    this.audio.resume();
+                }
+            }
+
+            requestAnimationFrame() {
+                this.rafCancelToken = requestAnimationFrame(this.rafCallback.bind(this));
+            }
+
+            cancelAnimationFrame() {
+                cancelAnimationFrame(this.rafCancelToken);
+                this.rafCancelToken = null;
+            }
+
+            run() {
+                this.requestAnimationFrame();
+            }
+
+            get ticks() {
+                return binjnes._emulator_get_ticks_f64(this.e);
+            }
+
+            runUntil(ticks) {
+                while (true) {
+                    const event = binjnes._emulator_run_until_f64(this.e, ticks);
+                    if (event & EVENT_NEW_FRAME) {
+                        this.video.uploadTexture();
+                        ninjapad.recorder.read(frameCounter) ||
+                            ninjapad.recorder.write(frameCounter);
+                        ++frameCounter;
+                    }
+                    if (event & EVENT_AUDIO_BUFFER_FULL) {
+                        this.audio.pushBuffer();
+                    }
+                    if (event & EVENT_UNTIL_TICKS) {
+                        break;
+                    }
+                }
+            }
+
+            rafCallback(startMs) {
+                this.requestAnimationFrame();
+                let deltaSec = 0;
+                const startSec = startMs / 1000;
+                deltaSec = Math.max(startSec - (this.lastRafSec || startSec), 0);
+                const startTicks = this.ticks;
+                const deltaTicks =
+                    Math.min(deltaSec, MAX_UPDATE_SEC) * PPU_TICKS_PER_SECOND;
+                const runUntilTicks = (startTicks + deltaTicks - this.leftoverTicks);
+                this.runUntil(runUntilTicks);
+                this.leftoverTicks = (this.ticks - runUntilTicks) | 0;
+                this.lastRafSec = startSec;
+                this.video.renderTexture();
+                this.updateGamepadStatus();
+            }
+
+            bindKeys() {
+                this.keyFuncs = {
+                    'BUTTON_A': binjnes._set_joyp_A.bind(null, this.e, 0),
+                    'BUTTON_B': binjnes._set_joyp_B.bind(null, this.e, 0),
+                    'BUTTON_SELECT': binjnes._set_joyp_select.bind(null, this.e, 0),
+                    'BUTTON_START': binjnes._set_joyp_start.bind(null, this.e, 0),
+                    'BUTTON_UP': binjnes._set_joyp_up.bind(null, this.e, 0),
+                    'BUTTON_DOWN': binjnes._set_joyp_down.bind(null, this.e, 0),
+                    'BUTTON_LEFT': binjnes._set_joyp_left.bind(null, this.e, 0),
+                    'BUTTON_RIGHT': binjnes._set_joyp_right.bind(null, this.e, 0),
+                };
+
+                this.boundKeyDown = this.keyDown.bind(this);
+                this.boundKeyUp = this.keyUp.bind(this);
+
+                window.addEventListener('keydown', this.boundKeyDown);
+                window.addEventListener('keyup', this.boundKeyUp);
+            }
+
+            unbindKeys() {
+                window.removeEventListener('keydown', this.boundKeyDown);
+                window.removeEventListener('keyup', this.boundKeyUp);
+            }
+
+            keyDown(event) {
+                if (event.keyCode in keyboardMappings) {
+                    event.preventDefault();
+                    let button = keyboardMappings[event.keyCode];
+                    if (kbButtonPresses[button]) return;
+                    this.buttonChanged(button, true);
+                    kbButtonPresses[button] = true;
+                }
+            }
+
+            keyUp(event) {
+                if (event.keyCode in keyboardMappings) {
+                    event.preventDefault();
+                    let button = keyboardMappings[event.keyCode];
+                    if (!kbButtonPresses[button]) return;
+                    this.buttonChanged(button, false);
+                    kbButtonPresses[button] = false;
+                }
+            }
+
+            buttonChanged(b, state) {
+                if (ninjapad.recorder.buffer(b, state)) return;
+                this.keyFuncs[b](state);
+                ninjapad.layout.showButtonPress(b, state);
+            }
+
+            bindGamepads() {
+                // TODO: copied from definitions in jsnes interface, find a way
+                // to share
+                this.controllers = {};
+
+                // Once the presses a button on one of the controllers, this
+                // will store the index of that controller so that only that
+                // controller is checked each frame. This is to avoid additional
+                // controllers triggering key_up events when they are just
+                // sitting there inactive.
+                this.curControllerIndex = -1;
+                this.boundAddGamepad = this.addGamepad.bind(this);
+                this.boundRemoveGamepad = this.removeGamepad.bind(this);
+                window.addEventListener("gamepadconnected", this.boundAddGamepad);
+                window.addEventListener("gamepaddisconnected", this.boundRemoveGamepad);
+                const haveEvents = 'ongamepadconnected' in window;
+            }
+
+            unbindGamepads() {
+                window.removeEventListener("gamepadconnected", this.boundAddGamepad);
+                window.removeEventListener("gamepaddisconnected", this.boundRemoveGamepad);
+            }
+
+            // Check all controllers to see if player has pressed any
+            // buttons. If they have, store that as the current controller.
+            findController() {
+                for (let j in this.controllers) {
+                    const controller = this.controllers[j];
+                    for (let i = 0; i < controller.buttons.length; ++i) {
+                        let val = controller.buttons[i];
+                        let pressed = val == 1.0;
+                        if (typeof(val) == "object") {
+                            pressed = val.pressed;
+                            val = val.value;
+                        }
+                        if (pressed) {
+                            this.curControllerIndex = j;
+                        }
+                    }
+                }
+            }
+
+            updateGamepadStatus() {
+                const haveEvents = 'ongamepadconnected' in window;
+                if (!haveEvents) {
+                    this.scanGamepads();
+                }
+
+                // If a controller has not yet been chosen, check for one
+                // now.
+                if (this.curControllerIndex == -1) {
+                    this.findController();
+                }
+
+                // Allow for case where controller was chosen this frame
+                if (this.curControllerIndex != -1) {
+                    const controller = this.controllers[this.curControllerIndex];
+                    for (let i = 0; i < controller.buttons.length; i++) {
+                        if (typeof(controllerMappings[i]) === "undefined") {
+                            continue;
+                        }
+                        const button = controller.buttons[i];
+                        const id = controllerMappings[i];
+                        if (button.pressed) {
+                            if (gpButtonPresses[id]) continue;
+                            this.audio.resume();
+                            buttonDown(id);
+                            gpButtonPresses[id] = true;
+                        } else {
+                            if (!gpButtonPresses[id]) continue;
+                            buttonUp(id);
+                            gpButtonPresses[id] = false;
+                        }
+                    }
+                }
+            }
+
+            addGamepad(gamepad) {
+                this.controllers[gamepad.index] = gamepad;
+            }
+
+            removeGamepad(gamepad) {
+                delete this.controllers[gamepad.index];
+            }
+
+            scanGamepads() {
+                const gamepads = navigator.getGamepads ? navigator.getGamepads()
+                                 : navigator.webkitGetGamepads
+                                     ? navigator.webkitGetGamepads()
+                                     : [];
+                for (let i = 0; i < gamepads.length; i++) {
+                    if (gamepads[i]) {
+                        if (gamepads[i].index in this.controllers) {
+                            this.controllers[gamepads[i].index] = gamepads[i];
+                        } else {
+                            this.addGamepad(gamepads[i]);
+                        }
+                    }
+                }
+            }
+        }
+
+        class Audio {
+            constructor(e) {
+                this.buffer = new Float32Array(binjnes.HEAP8.buffer,
+                  binjnes._get_audio_buffer_ptr(e),
+                  binjnes._get_audio_buffer_capacity(e));
+                this.startSec = 0;
+                this.volume = 0.5;
+                this.resume();
+            }
+
+            get sampleRate() { return Audio.ctx.sampleRate; }
+
+            pushBuffer() {
+                const nowSec = Audio.ctx.currentTime;
+                const nowPlusLatency = nowSec + AUDIO_LATENCY_SEC;
+                const volume = this.volume;
+                this.startSec = (this.startSec || nowPlusLatency);
+                if (this.startSec >= nowSec) {
+                    const buffer = Audio.ctx.createBuffer(1, AUDIO_FRAMES, this.sampleRate);
+                    const channel = buffer.getChannelData(0);
+                    for (let i = 0; i < AUDIO_FRAMES; i++) {
+                      channel[i] = this.buffer[i] * volume;
+                    }
+                    const bufferSource = Audio.ctx.createBufferSource();
+                    bufferSource.buffer = buffer;
+                    bufferSource.connect(Audio.ctx.destination);
+                    bufferSource.start(this.startSec);
+                    const bufferSec = AUDIO_FRAMES / this.sampleRate;
+                    this.startSec += bufferSec;
+                } else {
+                    this.startSec = nowPlusLatency;
+                }
+            }
+
+            pause() {
+                Audio.ctx.suspend();
+            }
+
+            resume() {
+                Audio.ctx.resume();
+            }
+        }
+
+        Audio.ctx = new AudioContext;
+
+        class Video {
+            constructor(e) {
+                let el = document.getElementById(EMULATION_DISPLAY);
+                this.ctx = el.getContext('2d');
+                this.imageData = this.ctx.createImageData(el.width, el.height);
+                this.palBuffer = new Uint16Array(binjnes.HEAP16.buffer,
+                    binjnes._get_frame_buffer_ptr(e),
+                    binjnes._get_frame_buffer_size(e) >> 1);
+                this.buffer = new Uint32Array(SCREEN_WIDTH * SCREEN_HEIGHT);
+            }
+
+            uploadTexture() {
+                // TODO: optimize?
+                for (let i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; ++i) {
+                    this.buffer[i] = NESPAL[this.palBuffer[i] & 63];
+                }
+                this.imageData.data.set(new Uint8ClampedArray(this.buffer.buffer));
+            }
+
+            renderTexture() {
+                this.ctx.putImageData(this.imageData, 0, 0);
+            }
+        }
+
+        // TODO: copied from definitions in jsnes interface, find a way to share
+        function nes_load_url(path, callback, ...args) {
+            const req = new XMLHttpRequest();
+            req.open("GET", path);
+            req.overrideMimeType("text/plain; charset=x-user-defined");
+            req.onerror = () => console.log(`Error loading ${path}`);
+            req.responseType = "arraybuffer";
+            req.onload = function() {
+                if (this.status === 200) {
+                    BinjnesEmulator.start(this.response);
+                    DEBUG && console.log(
+                        `NinjaPad: ROM loaded [${
+                            ninjapad.gameList[nes.getROMHash()] ||
+                            path.split("/").pop()
+                        }]`,
+                    );
+                    if (callback) callback(...args);
+                }
+                else if (this.status === 0) {
+                    // Aborted, so ignore error
+                }
+                else {
+                    req.onerror();
+                }
+            };
+            req.send();
+        }
+
+        function stringToUint8Array(s) {
+            const buffer = new Uint8Array(s.length);
+            for (let i = 0; i < s.length; ++i) {
+                buffer[i] = s.charCodeAt(i);
+            }
+            return buffer;
+        }
+
+        function uint8ArrayToString(u8a) {
+            let s = "";
+            for (let i = 0; i < u8a.length; ++i) {
+                s += String.fromCharCode(u8a[i]);
+            }
+            return s;
+        }
+
+        // If you wish to create your own interface,
+        // you need to provide the exact same keys
+        return {
+            display: {
+                width: SCREEN_WIDTH,
+                height: SCREEN_HEIGHT
+            },
+
+            core: function() {
+                throw "unimplemented core"
+            },
+
+            buttonDown: function(b) {
+                if (nes) nes.buttonChanged(b, true);
+            },
+
+            buttonUp: function(b) {
+                if (nes) nes.buttonChanged(b, false);
+            },
+
+            releaseAllButtons: function() {
+                if (nes) {
+                    nes.buttonChanged("BUTTON_UP");
+                    nes.buttonChanged("BUTTON_DOWN");
+                    nes.buttonChanged("BUTTON_LEFT");
+                    nes.buttonChanged("BUTTON_RIGHT");
+                    nes.buttonChanged("BUTTON_SELECT");
+                    nes.buttonChanged("BUTTON_START");
+                    nes.buttonChanged("BUTTON_A");
+                    nes.buttonChanged("BUTTON_B");
+                }
+            },
+
+            pause: function() {
+                if (nes) nes.pause();
+            },
+
+            resume: function() {
+                if (nes) nes.resume();
+            },
+
+            loadROMData: function(s) {
+                BinjnesEmulator.start(stringToUint8Array(s));
+            },
+
+            reloadROM: function() {
+                if (nes) BinjnesEmulator.start(nes.romData);
+            },
+
+            getROMData: function() {
+                if (nes) return nes.romData;
+            },
+
+            getROMHash: function() {
+                if (nes) return nes.getROMHash();
+            },
+
+            getROMName: function() {
+                if (nes) {
+                    const hash = nes.getROMHash();
+                    return ninjapad.gameList[hash];
+                }
+            },
+
+            saveState: function() {
+                if (nes) {
+                    const u8a = nes.saveState();
+                    const s = uint8ArrayToString(u8a);
+                    return ninjapad.utils.zip(s);
+                }
+            },
+
+            loadState: function(z) {
+                if (nes) {
+                    const s = ninjapad.utils.unzip(z);
+                    const u8a = stringToUint8Array(s);
+                    nes.loadState(u8a);
+                }
+            },
+
+            isROMLoaded: function() {
+                return nes !== null;
+            },
+
+            frameCount: function() {
+                return frameCounter;
+            },
+
+            resetFrameCount: function() {
+                frameCounter = 0;
+            },
+
+            memory: function() {
+                // TODO: return something better here?
+                return '';
+            },
+
+            initialize: function(callback, ...args) {
+                const expr = /^\?rom=(.*\.nes)/;
+                let url = expr.exec(window.location.search);
+                url = url ? "roms/" + url.pop() : DEFAULT_ROM;
+                nes_load_url(url, callback, ...args);
+            }
+        };
+    },
 };
