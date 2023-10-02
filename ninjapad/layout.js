@@ -62,16 +62,15 @@ ninjapad.layout = function() {
         var useJQuery = !ninjapad.utils.isFullScreen() || ninjapad.utils.isIOSDevice();
         var width = useJQuery ? $(window).width() : window.innerWidth;
         var height = useJQuery ? $(window).height() : window.innerHeight;
+        var aspectRatio = (256 / 240) * (8 / 7);
 
-        if (width > height) {
+        if (width / height > aspectRatio) {
+            elm.emuScreen.width("auto");
             elm.emuScreen.height("100%");
-            var newHeight = elm.emuScreen.height();
-            elm.emuScreen.width(emuScrWidth * (newHeight / emuScrHeight));
         }
         else {
             elm.emuScreen.width("100%");
-            var newWidth = elm.emuScreen.width();
-            elm.emuScreen.height(emuScrHeight * (newWidth / emuScrWidth));
+            elm.emuScreen.height("auto");
         }
         elm.gamepad.height("0%");
         elm.gamepadButtons.hide();
@@ -149,8 +148,7 @@ ninjapad.layout = function() {
             var bottom = "auto";
 
             elm.emuScreen.width(window.innerWidth);
-            var newWidth = elm.emuScreen.width();
-            elm.emuScreen.height(emuScrHeight * (newWidth / emuScrWidth));
+            elm.emuScreen.height("auto");
 
             var padHeight = ninjapad.utils.vw(47.5);
             var remainingHeight = height - elm.emuScreen.height();
@@ -182,9 +180,8 @@ ninjapad.layout = function() {
             elm.screen.detach().appendTo("#GAMEPAD");
 
             // Set the EMULATION_SCREEN element height to 100%
+            elm.emuScreen.width("auto");
             elm.emuScreen.height("100%"); //("90%");
-            var newHeight = elm.emuScreen.height();
-            elm.emuScreen.width(emuScrWidth * (newHeight / emuScrHeight));
 
             // Center the SCREEN element vertically
             elm.gamepad.css("display", "flex");

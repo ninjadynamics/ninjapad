@@ -33,12 +33,17 @@
 
             /* REQUIRED BY NINJAPAD */
             #emu-screen {
-                width: 256px;
-                max-width: 768px;
-                height: 240px;
-                max-height: 720px;
+                --screen-width: 256;
+                --screen-height: 240;
+                --pixel-ratio: calc(8 / 7);
+                --max-scale: 3;
+                max-width: calc(var(--screen-width) * var(--max-scale) * var(--pixel-ratio))px;
+                max-height: calc(var(--screen-height) * var(--max-scale))px;
                 position: relative;
                 margin: auto;
+                aspect-ratio: calc(var(--screen-width) * var(--pixel-ratio) / var(--screen-height));
+                object-fit: contain;
+                overflow: clip;
             }
 
             #emu-canvas {
