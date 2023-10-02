@@ -6,10 +6,12 @@ ninjapad.menu = function() {
     const pop = ninjapad.utils.pop;
     const inColor = ninjapad.utils.inColor;
     const iRModes = ["OFF", "ON-S", "ON-R"];
+    const pixelModes = ["SQUARE", "NTSC"];
 
     var countdown = null;
     var isOpen = false;
     var iRMode = 0;
+    var pixelModeIndex = 0;
 
     var fnESC = null;
     var fnESCArgs = [];
@@ -54,6 +56,9 @@ ninjapad.menu = function() {
     }
 
     function optionsMenu() {
+        pixelModeIndex = pixelModes.indexOf(ninjapad.layout.getPixelMode());
+        if (pixelModeIndex == -1) pixelModeIndex = 0;
+
         return ninjapad.utils.createMenu(null,
             ninjapad.utils.link(
                 "Export save data",
@@ -73,7 +78,11 @@ ninjapad.menu = function() {
             ninjapad.utils.link(
                 "Toggle button layout",
                 js="ninjapad.layout.toggleABLayout()"
-            )
+            ),
+            ninjapad.utils.link(
+                `Pixel mode ${inColor("lime", pixelModes[pixelModeIndex])}`,
+                js="ninjapad.menu.selectPixelMode(); ninjapad.menu.show.optionsMenu()"
+            ),
         );
     }
 
@@ -576,6 +585,15 @@ ninjapad.menu = function() {
                     ninjapad.elements.recStatus.hide();
                 }
             }
-        }
+        },
+
+        selectPixelMode: function(mode) {
+            pixelModeIndex = (
+                mode == undefined ?
+                ninjapad.utils.nextIndex(pixelModes, pixelModeIndex) :
+                mode < 0 ? pixelModeIndex : mode
+            );
+            ninjapad.layout.setPixelMode(pixelModes[pixelModeIndex]);
+        },
     }
 }();
