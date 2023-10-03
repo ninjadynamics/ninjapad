@@ -76,12 +76,12 @@ ninjapad.menu = function() {
                 hide=!INPUT_RECORDER
             ),
             ninjapad.utils.link(
-                "Toggle button layout",
-                js="ninjapad.layout.toggleABLayout()"
-            ),
-            ninjapad.utils.link(
                 `Pixel mode ${inColor("lime", pixelModes[pixelModeIndex])}`,
                 js="ninjapad.menu.selectPixelMode(); ninjapad.menu.show.optionsMenu()"
+            ),
+            ninjapad.utils.link(
+                "Toggle button layout",
+                js="ninjapad.layout.toggleABLayout()"
             ),
         );
     }

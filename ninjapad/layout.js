@@ -89,7 +89,7 @@ ninjapad.layout = function() {
         var useJQuery = !ninjapad.utils.isFullScreen() || ninjapad.utils.isIOSDevice();
         var width = useJQuery ? $(window).width() : window.innerWidth;
         var height = useJQuery ? $(window).height() : window.innerHeight;
-        var aspectRatio = updatePixelMode();
+        updatePixelMode();
 
         if (width / height > aspectRatio) {
             elm.emuScreen.width("auto");
