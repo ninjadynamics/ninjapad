@@ -10,6 +10,8 @@ const GAMEBOY_LAYOUT = true;
 // Emulation screen
 const EMULATION_SCREEN = "emu-screen";
 const EMULATION_DISPLAY = "emu-canvas";
+const PIXEL_MODE = "SQUARE";  // use "NTSC" for 8:7 pixel aspect ratio.
+const MAX_SCREEN_SCALE = 3;
 
 // Emulation settings
 const SYSTEM = "nes";

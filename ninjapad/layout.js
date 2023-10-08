@@ -8,6 +8,8 @@ ninjapad.layout = function() {
     var emuScrHeight;
     var isGBLayout;
     var coldStart = true;
+    var pixelMode;
+    var aspectRatio;
 
     function setOSDLayout() {
 
@@ -56,22 +58,46 @@ ninjapad.layout = function() {
         elm.emuScreen.css("position", "relative");
     }
 
+    function updatePixelMode() {
+        switch (pixelMode) {
+            case "SQUARE":
+            default:
+                pixelAspectRatio = 1;
+                break;
+            case "NTSC":
+                pixelAspectRatio = 8 / 7;
+                break;
+        }
+        aspectRatio = (256 / 240) * pixelAspectRatio;
+        elm.emuScreen.css("max-width", `${256 * MAX_SCREEN_SCALE * pixelAspectRatio}px`);
+        elm.emuScreen.css("max-height", `${240 * MAX_SCREEN_SCALE}px`);
+        elm.emuScreen.css("aspect-ratio", `${aspectRatio} / 1`);
+
+        // Copied from setOSDLayout() above.
+        const scrHeight = elm.emuScreen.height();
+        const scrWidth = elm.emuScreen.width();
+        elm.osd.css("height", scrHeight);
+        elm.osd.css("width", scrWidth);
+        elm.osd.css("font-size", 0.05 * scrHeight);
+        elm.recMenu.css("font-size", 0.05 * scrHeight);
+        elm.recStatus.css("font-size", 0.05 * scrHeight);
+    }
+
     function setDesktopLayout() {
         DEBUG && console.log("NinjaPad: Desktop mode selected");
 
         var useJQuery = !ninjapad.utils.isFullScreen() || ninjapad.utils.isIOSDevice();
         var width = useJQuery ? $(window).width() : window.innerWidth;
         var height = useJQuery ? $(window).height() : window.innerHeight;
+        updatePixelMode();
 
-        if (width > height) {
+        if (width / height > aspectRatio) {
+            elm.emuScreen.width("auto");
             elm.emuScreen.height("100%");
-            var newHeight = elm.emuScreen.height();
-            elm.emuScreen.width(emuScrWidth * (newHeight / emuScrHeight));
         }
         else {
             elm.emuScreen.width("100%");
-            var newWidth = elm.emuScreen.width();
-            elm.emuScreen.height(emuScrHeight * (newWidth / emuScrWidth));
+            elm.emuScreen.height("auto");
         }
         elm.gamepad.height("0%");
         elm.gamepadButtons.hide();
@@ -109,6 +135,7 @@ ninjapad.layout = function() {
             elm.recStatus.detach().appendTo(elm.emuScreen);
             $("body *").not("#ninjaPad *").not("#ninjaPad").remove();
             isGBLayout = GAMEBOY_LAYOUT;
+            pixelMode = PIXEL_MODE;
             coldStart = false;
         }
 
@@ -117,6 +144,7 @@ ninjapad.layout = function() {
         var useJQuery = !ninjapad.utils.isFullScreen() || ninjapad.utils.isIOSDevice();
         var width = useJQuery ? $(window).width() : window.innerWidth;
         var height = useJQuery ? $(window).height() : window.innerHeight;
+        updatePixelMode();
 
         const functionalLeft = $("#FUNCTIONAL-BL");
         const functionalRight = $("#FUNCTIONAL-TR");
@@ -149,8 +177,7 @@ ninjapad.layout = function() {
             var bottom = "auto";
 
             elm.emuScreen.width(window.innerWidth);
-            var newWidth = elm.emuScreen.width();
-            elm.emuScreen.height(emuScrHeight * (newWidth / emuScrWidth));
+            elm.emuScreen.height("auto");
 
             var padHeight = ninjapad.utils.vw(47.5);
             var remainingHeight = height - elm.emuScreen.height();
@@ -182,9 +209,8 @@ ninjapad.layout = function() {
             elm.screen.detach().appendTo("#GAMEPAD");
 
             // Set the EMULATION_SCREEN element height to 100%
+            elm.emuScreen.width("auto");
             elm.emuScreen.height("100%"); //("90%");
-            var newHeight = elm.emuScreen.height();
-            elm.emuScreen.width(emuScrWidth * (newHeight / emuScrHeight));
 
             // Center the SCREEN element vertically
             elm.gamepad.css("display", "flex");
@@ -282,6 +308,15 @@ ninjapad.layout = function() {
     return {
         toggleABLayout: function() {
             setABLayout(true);
+        },
+
+        getPixelMode: function() {
+            return pixelMode;
+        },
+
+        setPixelMode: function(mode) {
+            pixelMode = mode;
+            updatePixelMode();
         },
 
         setPageLayout: function() {
