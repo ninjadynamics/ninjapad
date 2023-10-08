@@ -1,7 +1,11 @@
-# NinjaPad v1.2.5
-NinjaPad is a retro emulation interface for both desktop and mobile.  
-Originally meant for the JSNES emulator, NinjaPad is designed in a developer
-friendly way, allowing for anyone to expand its capabilities.  
+# NinjaPad v1.3.0
+NinjaPad is a retro emulation graphical interface for both desktop and mobile.  
+Originally meant for the NES emulation, NinjaPad is designed in a developer
+friendly way, allowing for anyone to expand its capabilities.
+
+## Supported emulators
+- JSNES
+- BinjNES
 
 ## Try it
 https://ninjadynamics.github.io/ninjapad/  
@@ -17,12 +21,12 @@ in the config file.
 
 ## Dependencies
 - jQuery  
-- Emulator
+- Emulators
 
 ## Interfaces
 The file '**ninjapad/interface.js**' allows you to create new interfaces for different emulators.  
-Use the existing **jsnes** interface as a template to create your own.  
+Use the existing **JSNES** or **BinjNES* interface as a template to create your own.  
 
 ## License
 **Creative Commons Attribution 4.0 International Public License**
-- Attribution is appreciated, but it's alright if you don't.
+- Attribution is appreciated, but not really necessary.
