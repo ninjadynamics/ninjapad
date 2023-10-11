@@ -483,24 +483,6 @@ ninjapad.interface = {
         const EVENT_AUDIO_BUFFER_FULL = 2;
         const EVENT_UNTIL_TICKS = 4;
 
-        // From FrakenGraphics, based on FBX Smooth:
-        // https://www.patreon.com/posts/nes-palette-for-47391225
-        const NESPAL = [
-            0xff616161, 0xff880000, 0xff990d1f, 0xff791337, 0xff601256,
-            0xff10005d, 0xff000e52, 0xff08233a, 0xff0c3521, 0xff0e410d,
-            0xff174417, 0xff1f3a00, 0xff572f00, 0xff000000, 0xff000000,
-            0xff000000, 0xffaaaaaa, 0xffc44d0d, 0xffde244b, 0xffcf1269,
-            0xffad1490, 0xff481c9d, 0xff043492, 0xff055073, 0xff13695d,
-            0xff117a16, 0xff088013, 0xff497612, 0xff91661c, 0xff000000,
-            0xff000000, 0xff000000, 0xfffcfcfc, 0xfffc9a63, 0xfffc7e8a,
-            0xfffc6ab0, 0xfff26ddd, 0xffab71e7, 0xff5886e3, 0xff229ecc,
-            0xff00b1a8, 0xff00c172, 0xff4ecd5a, 0xff8ec234, 0xffcebe4f,
-            0xff424242, 0xff000000, 0xff000000, 0xfffcfcfc, 0xfffcd4be,
-            0xfffccaca, 0xfffcc4d9, 0xfffcc1ec, 0xffe7c3fa, 0xffc3cef7,
-            0xffa7cde2, 0xff9cdbda, 0xff9ee3c8, 0xffb8e5bf, 0xffc8ebb2,
-            0xffebe5b7, 0xffacacac, 0xff000000, 0xff000000,
-        ];
-
         // TODO: copied from definitions in jsnes interface, find a way to share
         const controllerMappings = {  // DualShock 4
             12: "BUTTON_UP",        // DPAD Up
@@ -913,20 +895,19 @@ ninjapad.interface = {
         class Video {
             constructor(e) {
                 let el = document.getElementById(EMULATION_DISPLAY);
+                this.e = e;
                 this.ctx = el.getContext('2d');
                 this.imageData = this.ctx.createImageData(el.width, el.height);
-                this.palBuffer = new Uint16Array(binjnes.HEAP16.buffer,
-                    binjnes._get_frame_buffer_ptr(e),
-                    binjnes._get_frame_buffer_size(e) >> 1);
-                this.buffer = new Uint32Array(SCREEN_WIDTH * SCREEN_HEIGHT);
+                this.rgbaBuffer = new Uint32Array(binjnes.HEAP32.buffer,
+                    binjnes._get_rgba_frame_buffer_ptr(e),
+                    binjnes._get_rgba_frame_buffer_size(e) >> 2);
             }
 
             uploadTexture() {
-                // TODO: optimize?
-                for (let i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; ++i) {
-                    this.buffer[i] = NESPAL[this.palBuffer[i] & 63];
-                }
-                this.imageData.data.set(new Uint8ClampedArray(this.buffer.buffer));
+                binjnes._emulator_convert_frame_buffer_simple(this.e);
+                this.imageData.data.set(new Uint8ClampedArray(
+                    this.rgbaBuffer.buffer, this.rgbaBuffer.byteOffset,
+                    this.rgbaBuffer.byteLength));
             }
 
             renderTexture() {
