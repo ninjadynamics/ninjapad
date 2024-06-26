@@ -108,7 +108,9 @@ ninjapad.interface = {
         function onAnimationFrame() {
             window.setTimeout(onAnimationFrame, 1000/60);
             image.data.set(framebuffer_u8);
-            canvas_ctx.putImageData(image, 0, 0);
+            canvas_ctx.putImageData(
+                image, 0, 0,
+                0, OVERSCAN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT - OVERSCAN_TOP - OVERSCAN_BOTTOM);
             if (!ninjapad.pause.state.isEmulationPaused) nes.frame();
         }
 
@@ -897,7 +899,7 @@ ninjapad.interface = {
                 let el = document.getElementById(EMULATION_DISPLAY);
                 this.e = e;
                 this.ctx = el.getContext('2d');
-                this.imageData = this.ctx.createImageData(el.width, el.height);
+                this.imageData = this.ctx.createImageData(SCREEN_WIDTH, SCREEN_HEIGHT);
                 this.rgbaBuffer = new Uint32Array(binjnes.HEAP32.buffer,
                     binjnes._get_rgba_frame_buffer_ptr(e),
                     binjnes._get_rgba_frame_buffer_size(e) >> 2);
@@ -911,7 +913,9 @@ ninjapad.interface = {
             }
 
             renderTexture() {
-                this.ctx.putImageData(this.imageData, 0, 0);
+                this.ctx.putImageData(
+                    this.imageData, 0, 0,
+                    0, OVERSCAN_TOP, SCREEN_WIDTH, SCREEN_HEIGHT - OVERSCAN_TOP - OVERSCAN_BOTTOM);
             }
         }
 
