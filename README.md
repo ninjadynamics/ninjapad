@@ -25,7 +25,7 @@ in the config file.
 
 ## Interfaces
 The file '**ninjapad/interface.js**' allows you to create new interfaces for different emulators.  
-Use the existing **JSNES** or **BinjNES* interface as a template to create your own.  
+Use the existing **JSNES** or **BinjNES** interface as a template to create your own.  
 
 ## License
 **Creative Commons Attribution 4.0 International Public License**
